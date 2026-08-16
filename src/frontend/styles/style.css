@@ -197,6 +197,7 @@ a:hover {
   color: var(--text-secondary);
 
   cursor: pointer;
+
   transition:
     background 0.15s ease,
     color 0.15s ease,
@@ -211,18 +212,22 @@ a:hover {
 .nav-button.active {
   background: var(--blue-soft);
   border-color: rgba(22, 131, 255, 0.35);
+
   color: #69b5ff;
 }
 
 /* =========================================================
-   MAIN APP LAYOUT
+   INSPECTOR LAYOUT
    ========================================================= */
 
-.inspector-page {
+.inspector {
   display: flex;
 
   width: 100%;
   height: calc(100% - var(--topbar-height));
+
+  min-width: 0;
+  min-height: 0;
 }
 
 /* =========================================================
@@ -382,6 +387,7 @@ a:hover {
 .content {
   display: flex;
 
+  min-width: 0;
   min-height: 0;
   height: 100%;
 
@@ -397,6 +403,7 @@ a:hover {
   border-right: 1px solid var(--border);
 
   overflow-y: auto;
+  flex-shrink: 0;
 }
 
 .record-item {
@@ -537,6 +544,31 @@ a:hover {
   font-size: 22px;
   font-weight: 650;
 }
+.detail-header .source-label {
+  display: inline-flex;
+  align-items: center;
+
+  padding: 4px 9px;
+
+  background: rgba(22, 131, 255, 0.14);
+  border: 1px solid rgba(22, 131, 255, 0.3);
+  border-radius: 5px;
+
+  color: #65b4ff;
+
+  font-size: 11px;
+  font-weight: 650;
+  letter-spacing: 0.2px;
+  line-height: 1;
+}
+
+.detail-actions {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+
+  flex-shrink: 0;
+}
 
 /* =========================================================
    DETAIL GRID
@@ -645,6 +677,9 @@ a:hover {
    ========================================================= */
 
 .matcher-page {
+  display: flex;
+  flex-direction: column;
+
   width: 100%;
   height: calc(100% - var(--topbar-height));
 
@@ -754,6 +789,7 @@ a:hover {
   );
 
   gap: 14px;
+  margin-bottom: 20px;
 }
 
 .matcher-record {
@@ -836,7 +872,8 @@ a:hover {
    ========================================================= */
 
 .add-record-panel {
-  margin-top: 20px;
+  width: 100%;
+  margin-top: 0;
 
   background: var(--panel);
   border: 1px solid var(--border);
@@ -933,6 +970,7 @@ a:hover {
 .matcher-search-results {
   max-height: 420px;
 
+  background: var(--bg-secondary);
   border-top: 1px solid var(--border);
 
   overflow-y: auto;
@@ -973,6 +1011,10 @@ a:hover {
 .matcher-search-result:disabled {
   cursor: default;
   opacity: 0.65;
+}
+
+.matcher-search-result:last-child {
+  border-bottom: 0;
 }
 
 .matcher-result-main {
@@ -1030,6 +1072,39 @@ a:hover {
 }
 
 /* =========================================================
+   MATCHER ADD ANOTHER
+   ========================================================= */
+
+.matcher-add-another {
+  display: flex;
+  justify-content: center;
+
+  margin-top: 0;
+}
+
+/* =========================================================
+   MATCHER CONTENT FLOW
+   ========================================================= */
+
+.matcher-content {
+  display: flex;
+  flex-direction: column;
+
+  width: 100%;
+}
+
+/* =========================================================
+   RECORD ITEM TITLE
+   ========================================================= */
+
+.record-item-title {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+
+/* =========================================================
    RESPONSIVE
    ========================================================= */
 
@@ -1082,7 +1157,7 @@ a:hover {
     padding: 8px 11px;
   }
 
-  .inspector-page {
+  .inspector {
     height: auto;
     min-height: calc(100vh - var(--topbar-height));
   }
@@ -1137,59 +1212,9 @@ a:hover {
   .matcher-records {
     grid-template-columns: 1fr;
   }
-}
 
-.record-item-title {
-  display: flex;
-  align-items: center;
-  gap: 8px;
-  flex-wrap: wrap;
-}
-
-
-/* =========================================================
-   MATCHER ADD ANOTHER
-   ========================================================= */
-
-.matcher-add-another {
-  display: flex;
-  justify-content: center;
-
-  margin-top: 20px;
-}
-
-/* =========================================================
-   MATCHER SEARCH MODE
-   ========================================================= */
-
-.add-record-panel {
-  width: 100%;
-  margin-top: 0;
-}
-
-.matcher-search-results {
-  background: var(--bg-secondary);
-}
-
-.matcher-search-result:last-child {
-  border-bottom: 0;
-}
-
-/* =========================================================
-   MATCHER CONTENT FLOW
-   ========================================================= */
-
-.matcher-content {
-  display: flex;
-  flex-direction: column;
-  width: 100%;
-}
-
-/* =========================================================
-   MATCHER RECORD SPACING
-   ========================================================= */
-
-.matcher-records {
-  gap: 14px;
-  margin-bottom: 20px;
+  .detail-header {
+    flex-direction: column;
+    gap: 15px;
+  }
 }

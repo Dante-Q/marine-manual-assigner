@@ -1,7 +1,10 @@
 import { useMemo, useState } from "react";
 
-function Matcher({ records }) {
-  const [matchedRecords, setMatchedRecords] = useState([]);
+function Matcher({
+  records,
+  matchedRecords,
+  setMatchedRecords
+}) {
   const [addingRecord, setAddingRecord] = useState(false);
   const [search, setSearch] = useState("");
 
@@ -55,10 +58,20 @@ function Matcher({ records }) {
   }
 
   function addRecord(record) {
-    setMatchedRecords(current => [
-      ...current,
-      record
-    ]);
+    setMatchedRecords(current => {
+      const alreadyAdded = current.some(
+        existing => existing.id === record.id
+      );
+
+      if (alreadyAdded) {
+        return current;
+      }
+
+      return [
+        ...current,
+        record
+      ];
+    });
 
     setSearch("");
   }
@@ -74,36 +87,48 @@ function Matcher({ records }) {
   return (
     <div className="matcher-page">
 
-      <div className="matcher-header">
-
-        <div>
-          <h2>
-            Manual Matcher
-          </h2>
-
-          <p>
-            Build and manage marina record
-            matches across data sources.
-          </p>
-        </div>
-
-        {!addingRecord && (
-          <button
-            className="primary-button"
-            onClick={openAddRecord}
-          >
-            Add New Record
-          </button>
-        )}
-
-      </div>
-
       <div className="matcher-content">
+
+        <div className="matcher-header">
+
+          <div>
+            <h2>
+              Manual Matcher
+            </h2>
+
+            <p>
+              Build and manage marina record
+              matches across data sources.
+            </p>
+          </div>
+
+          {!addingRecord && (
+            <button
+              className="primary-button"
+              onClick={openAddRecord}
+            >
+              Add New Record
+            </button>
+          )}
+
+        </div>
 
         {matchedRecords.length > 0 && (
           <MatchedRecords
             records={matchedRecords}
             onRemove={removeRecord}
+            onAdd={openAddRecord}
+            hideAddButton={addingRecord}
+          />
+        )}
+
+        {addingRecord && (
+          <AddRecordSearch
+            search={search}
+            setSearch={setSearch}
+            results={searchResults}
+            onAdd={addRecord}
+            onClose={closeAddRecord}
           />
         )}
 
@@ -116,9 +141,8 @@ function Matcher({ records }) {
               </h2>
 
               <p>
-                Add records from the available
-                data sources to begin building
-                a match.
+                Add records from the available data
+                sources to begin building a match.
               </p>
 
               <button
@@ -128,28 +152,6 @@ function Matcher({ records }) {
                 Add New Record
               </button>
 
-            </div>
-          )}
-
-        {addingRecord && (
-          <AddRecordSearch
-            search={search}
-            setSearch={setSearch}
-            results={searchResults}
-            onAdd={addRecord}
-            onClose={closeAddRecord}
-          />
-        )}
-
-        {matchedRecords.length > 0 &&
-          !addingRecord && (
-            <div className="matcher-add-another">
-              <button
-                className="primary-button"
-                onClick={openAddRecord}
-              >
-                Add Another Record
-              </button>
             </div>
           )}
 
@@ -250,55 +252,74 @@ function AddRecordSearch({
 
 function MatchedRecords({
   records,
-  onRemove
+  onRemove,
+  onAdd,
+  hideAddButton = false
 }) {
+  if (records.length === 0) {
+    return null;
+  }
+
   return (
-    <div className="matcher-records">
+    <>
+      <div className="matcher-records">
 
-      {records.map(record => (
-        <div
-          key={record.id}
-          className="matcher-record"
-        >
+        {records.map(record => (
+          <div
+            key={record.id}
+            className="matcher-record"
+          >
 
-          <div className="matcher-record-header">
+            <div className="matcher-record-header">
 
-            <div>
+              <div>
 
-              <span className="source-label">
-                {getSourceName(record.source)}
-              </span>
+                <span className="source-label">
+                  {getSourceName(record.source)}
+                </span>
 
-              <h3>
-                {record.name ||
-                  "Unnamed marina"}
-              </h3>
+                <h3>
+                  {record.name ||
+                    "Unnamed marina"}
+                </h3>
+
+              </div>
+
+              <button
+                className="remove-record-button"
+                onClick={() =>
+                  onRemove(record.id)
+                }
+                aria-label={`Remove ${
+                  record.name ||
+                  "record"
+                }`}
+              >
+                ×
+              </button>
 
             </div>
 
-            <button
-              className="remove-record-button"
-              onClick={() =>
-                onRemove(record.id)
-              }
-              aria-label={`Remove ${
-                record.name ||
-                "record"
-              }`}
-            >
-              ×
-            </button>
+            <div className="matcher-record-location">
+              {formatLocation(record)}
+            </div>
 
           </div>
+        ))}
 
-          <div className="matcher-record-location">
-            {formatLocation(record)}
-          </div>
+      </div>
 
+      {!hideAddButton && (
+        <div className="matcher-add-another">
+          <button
+            className="primary-button"
+            onClick={onAdd}
+          >
+            Add Another Record
+          </button>
         </div>
-      ))}
-
-    </div>
+      )}
+    </>
   );
 }
 

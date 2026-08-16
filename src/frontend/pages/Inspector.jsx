@@ -1,6 +1,10 @@
 import { useMemo, useState } from "react";
 
-function Inspector({ records }) {
+function Inspector({
+  records,
+  matchedRecords,
+  setMatchedRecords
+}) {
   const [selectedSource, setSelectedSource] =
     useState("all");
 
@@ -34,7 +38,6 @@ function Inspector({ records }) {
       search.trim().toLowerCase();
 
     return records.filter(record => {
-
       if (
         selectedSource !== "all" &&
         record.source !== selectedSource
@@ -70,8 +73,33 @@ function Inspector({ records }) {
     setSelectedRecord(null);
   }
 
+  function isMatched(recordId) {
+    return matchedRecords.some(
+      record => record.id === recordId
+    );
+  }
+
+  function addToMatcher(record) {
+    if (isMatched(record.id)) {
+      return;
+    }
+
+    setMatchedRecords(current => [
+      ...current,
+      record
+    ]);
+  }
+
+  function removeFromMatcher(recordId) {
+    setMatchedRecords(current =>
+      current.filter(
+        record => record.id !== recordId
+      )
+    );
+  }
+
   return (
-    <div className="inspector-page">
+    <div className="inspector">
 
       <aside className="sidebar">
 
@@ -198,6 +226,11 @@ function Inspector({ records }) {
             {selectedRecord ? (
               <RecordDetail
                 record={selectedRecord}
+                matched={isMatched(
+                  selectedRecord.id
+                )}
+                onAdd={addToMatcher}
+                onRemove={removeFromMatcher}
               />
             ) : (
               <div className="empty-state">
@@ -253,7 +286,12 @@ function SourceButton({
   );
 }
 
-function RecordDetail({ record }) {
+function RecordDetail({
+  record,
+  matched,
+  onAdd,
+  onRemove
+}) {
   return (
     <>
       <div className="detail-header">
@@ -268,6 +306,30 @@ function RecordDetail({ record }) {
             {record.name ||
               "Unnamed marina"}
           </h2>
+
+        </div>
+
+        <div className="detail-actions">
+
+          {matched ? (
+            <button
+              className="remove-record-button"
+              onClick={() =>
+                onRemove(record.id)
+              }
+            >
+              Remove from Match
+            </button>
+          ) : (
+            <button
+              className="primary-button"
+              onClick={() =>
+                onAdd(record)
+              }
+            >
+              Add to Matcher
+            </button>
+          )}
 
         </div>
 
