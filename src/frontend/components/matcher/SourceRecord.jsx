@@ -1,3 +1,5 @@
+import LocationMap from "../LocationMap.jsx";
+
 function SourceRecord({
   record,
   onRemove
@@ -36,6 +38,12 @@ function SourceRecord({
       <div className="source-record-location">
         {formatLocation(record)}
       </div>
+
+      <LocationMap
+        latitude={record.latitude}
+        longitude={record.longitude}
+        name={record.name}
+      />
 
       <div className="source-record-grid">
 

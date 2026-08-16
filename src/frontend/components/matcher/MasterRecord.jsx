@@ -1,3 +1,5 @@
+import LocationMap from "../LocationMap.jsx";
+
 function MasterRecord({
   record,
   onChange,
@@ -32,6 +34,12 @@ function MasterRecord({
         </button>
 
       </div>
+
+      <LocationMap
+        latitude={record.latitude}
+        longitude={record.longitude}
+        name={record.name}
+      />
 
       <div className="master-record-form">
 

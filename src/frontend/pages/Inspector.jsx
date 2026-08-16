@@ -1,5 +1,7 @@
 import { useMemo, useState } from "react";
 
+import LocationMap from "../components/LocationMap.jsx";
+
 function Inspector({
   records,
   savedRecords,
@@ -536,6 +538,12 @@ function RecordDetail({
 
       </div>
 
+      <LocationMap
+        latitude={record.latitude}
+        longitude={record.longitude}
+        name={record.name}
+      />
+
       <div className="detail-grid">
 
         <DetailField
@@ -672,6 +680,12 @@ function SavedRecordDetail({
         </div>
 
       </div>
+
+      <LocationMap
+        latitude={record.latitude}
+        longitude={record.longitude}
+        name={record.name}
+      />
 
       <div className="detail-grid">
 
