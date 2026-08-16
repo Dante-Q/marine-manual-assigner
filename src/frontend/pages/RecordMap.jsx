@@ -31,6 +31,9 @@ function RecordMap({
   const [rawDraft, setRawDraft] = useState(null);
   const [hideMatchedPins, setHideMatchedPins] = useState(false);
   const [showSavedPins, setShowSavedPins] = useState(true);
+  const [mapSearch, setMapSearch] = useState("");
+  const [mapFocusRecord, setMapFocusRecord] = useState(null);
+  const [mapFocusToken, setMapFocusToken] = useState(0);
   const [saving, setSaving] = useState(false);
   const [saveError, setSaveError] = useState(null);
   const [saveSuccess, setSaveSuccess] = useState(null);
@@ -113,6 +116,30 @@ function RecordMap({
     );
   }, [visibleRecords, rawDraft]);
 
+  const mapSearchResults = useMemo(() => {
+    const query = mapSearch.trim().toLowerCase();
+
+    if (!query) return [];
+
+    return [
+      ...records,
+      ...savedRecords.map(record => ({ ...record, mapSource: "saved" }))
+    ]
+      .filter(hasCoordinates)
+      .filter(record => {
+        const searchable = [
+          record.name,
+          record.id,
+          record.source,
+          record.mapSource,
+          JSON.stringify(record.address)
+        ].filter(Boolean).join(" ").toLowerCase();
+
+        return searchable.includes(query);
+      })
+      .slice(0, 8);
+  }, [records, savedRecords, mapSearch]);
+
   const handleSelectRecord = useCallback(record => {
     setSelectedRecord({ ...record });
     setSourceRecords([]);
@@ -154,6 +181,14 @@ function RecordMap({
     setActiveMatchTab("master");
     setSaveError(null);
     setSaveSuccess(null);
+  }
+
+  function focusMapRecord(record) {
+    setSelectedSource("all");
+    setShowSavedPins(true);
+    setMapFocusRecord(record);
+    setMapFocusToken(current => current + 1);
+    setMapSearch("");
   }
 
   function updateSelectedRecord(field, value) {
@@ -274,6 +309,32 @@ function RecordMap({
         </div>
       </header>
 
+      <div className="record-map-search">
+        <input
+          type="search"
+          placeholder="Search a record on the map..."
+          value={mapSearch}
+          onChange={event => setMapSearch(event.target.value)}
+        />
+
+        {mapSearchResults.length > 0 && (
+          <div className="record-map-search-results">
+            {mapSearchResults.map(record => (
+              <button
+                key={`${record.mapSource ?? record.source}:${record.id}`}
+                onClick={() => focusMapRecord(record)}
+              >
+                <span>
+                  <strong>{record.name || "Unnamed marina"}</strong>
+                  <small>{record.id}</small>
+                </span>
+                <em>{getMapSourceName(record.mapSource ?? record.source)}</em>
+              </button>
+            ))}
+          </div>
+        )}
+      </div>
+
       <div className="record-map-filters" aria-label="Filter map records by source">
         <SourceFilter
           source="all"
@@ -360,7 +421,9 @@ function RecordMap({
           sourceRecordIds={sourceRecords.map(record => record.id)}
           initialView={mapView}
           onViewChange={onMapViewChange}
-          focusedRecord={rawDraft}
+          focusedRecord={rawDraft ?? mapFocusRecord}
+          focusToken={mapFocusToken}
+          focusZoom={Boolean(mapFocusRecord) && !rawDraft}
         />
       </div>
 
@@ -567,6 +630,17 @@ function getRawSourceLabel(source) {
   };
 
   return labels[source] ?? source;
+}
+
+function getMapSourceName(source) {
+  const names = {
+    tyha: "TYHA",
+    "marinas-com": "Marinas.com",
+    osm: "OSM",
+    saved: "Saved"
+  };
+
+  return names[source] ?? source;
 }
 
 export default RecordMap;

@@ -66,7 +66,9 @@ function LeafletMap({
   sourceRecordIds = [],
   initialView,
   onViewChange,
-  focusedRecord
+  focusedRecord,
+  focusToken,
+  focusZoom = false
 }) {
   const containerRef = useRef(null);
   const mapRef = useRef(null);
@@ -264,9 +266,19 @@ function LeafletMap({
       longitude >= -180 &&
       longitude <= 180
     ) {
-      mapRef.current.panTo([latitude, longitude]);
+      if (focusZoom) {
+        mapRef.current.setView([latitude, longitude], 14);
+      } else {
+        mapRef.current.panTo([latitude, longitude]);
+      }
     }
-  }, [ready, focusedRecord?.latitude, focusedRecord?.longitude]);
+  }, [
+    ready,
+    focusedRecord?.latitude,
+    focusedRecord?.longitude,
+    focusToken,
+    focusZoom
+  ]);
 
   if (error) {
     return <div className="record-map-error">{error}</div>;
