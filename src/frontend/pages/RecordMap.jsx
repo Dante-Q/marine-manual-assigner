@@ -8,15 +8,24 @@ import {
 
 import LeafletMap from "../components/map/LeafletMap.jsx";
 import MasterRecord from "../components/matcher/MasterRecord.jsx";
-import { saveMatch } from "../api/api.js";
+import SourceRecord from "../components/matcher/SourceRecord.jsx";
+import {
+  saveMatch,
+  updateMatch
+} from "../api/api.js";
 
 function RecordMap({
   records,
   savedRecords,
-  setSavedRecords
+  setSavedRecords,
+  mapView,
+  onMapViewChange
 }) {
   const [selectedSource, setSelectedSource] = useState("all");
   const [selectedRecord, setSelectedRecord] = useState(null);
+  const [sourceRecords, setSourceRecords] = useState([]);
+  const [hideMatchedPins, setHideMatchedPins] = useState(false);
+  const [showSavedPins, setShowSavedPins] = useState(true);
   const [saving, setSaving] = useState(false);
   const [saveError, setSaveError] = useState(null);
   const [saveSuccess, setSaveSuccess] = useState(null);
@@ -33,23 +42,71 @@ function RecordMap({
     saved: savedRecords.length
   }), [records, savedRecords]);
 
-  const visibleRecords = useMemo(() => {
-    const candidates =
-      selectedSource === "saved"
-        ? savedRecords.map(record => ({ ...record, source: "saved" }))
-        : records.filter(
-            record =>
-              selectedSource === "all" ||
-              record.source === selectedSource
-          );
+  const matchedRecordIds = useMemo(() => {
+    const ids = new Set();
 
-    return candidates.filter(hasCoordinates);
-  }, [records, savedRecords, selectedSource]);
+    for (const savedRecord of savedRecords) {
+      for (
+        const sourceRecord
+        of savedRecord.sourceRecords ?? []
+      ) {
+        if (sourceRecord.id) {
+          ids.add(sourceRecord.id);
+        }
+      }
+    }
+
+    return ids;
+  }, [savedRecords]);
+
+  const visibleRecords = useMemo(() => {
+    const savedPins = showSavedPins
+      ? savedRecords.map(record => ({
+          ...record,
+          mapSource: "saved"
+        }))
+      : [];
+
+    if (selectedSource === "saved") {
+      return savedPins.filter(hasCoordinates);
+    }
+
+    const rawPins = records.filter(record => {
+      const matchesSource =
+        selectedSource === "all" ||
+        record.source === selectedSource;
+
+      return (
+        matchesSource &&
+        (!hideMatchedPins || !matchedRecordIds.has(record.id))
+      );
+    });
+
+    return [...rawPins, ...savedPins].filter(hasCoordinates);
+  }, [
+    records,
+    savedRecords,
+    selectedSource,
+    hideMatchedPins,
+    showSavedPins,
+    matchedRecordIds
+  ]);
 
   const handleSelectRecord = useCallback(record => {
     setSelectedRecord({ ...record });
+    setSourceRecords([]);
     setSaveError(null);
     setSaveSuccess(null);
+  }, []);
+
+  const handleAddSourceRecord = useCallback(record => {
+    setSourceRecords(current => {
+      if (current.some(source => source.id === record.id)) {
+        return current;
+      }
+
+      return [...current, { ...record }];
+    });
   }, []);
 
   useEffect(() => {
@@ -64,6 +121,7 @@ function RecordMap({
   function handleSourceChange(source) {
     setSelectedSource(source);
     setSelectedRecord(null);
+    setSourceRecords([]);
     setSaveError(null);
     setSaveSuccess(null);
   }
@@ -75,6 +133,12 @@ function RecordMap({
     }));
   }
 
+  function removeSourceRecord(recordId) {
+    setSourceRecords(current =>
+      current.filter(record => record.id !== recordId)
+    );
+  }
+
   async function saveSelectedRecord() {
     if (!selectedRecord) {
       return;
@@ -84,19 +148,32 @@ function RecordMap({
     setSaveError(null);
 
     try {
-      const savedRecord = await saveMatch({
-        masterRecord: selectedRecord,
-        sourceRecords: []
-      });
+      const { mapSource, ...recordToSave } = selectedRecord;
+      const editingSavedRecord = mapSource === "saved";
 
-      setSavedRecords(current => [
-        ...current,
-        savedRecord
-      ]);
+      const savedRecord = editingSavedRecord
+        ? await updateMatch(recordToSave.id, recordToSave)
+        : await saveMatch({
+            masterRecord: recordToSave,
+            sourceRecords
+          });
+
+      setSavedRecords(current =>
+        editingSavedRecord
+          ? current.map(record =>
+              record.id === savedRecord.id
+                ? savedRecord
+                : record
+            )
+          : [...current, savedRecord]
+      );
       setSaveSuccess(
-        `${savedRecord.id} was saved without changing the raw source record.`
+        editingSavedRecord
+          ? `${savedRecord.id} was updated in data/saved.`
+          : `${savedRecord.id} was saved without changing the raw source record.`
       );
       setSelectedRecord(null);
+      setSourceRecords([]);
     } catch (error) {
       console.error(error);
       setSaveError(
@@ -157,23 +234,54 @@ function RecordMap({
         />
       </div>
 
+      <div className="record-map-controls">
+        <div className="record-map-legend" aria-label="Map pin colors">
+          <LegendItem source="tyha" label="TYHA" />
+          <LegendItem source="marinas-com" label="Marinas.com" />
+          <LegendItem source="osm" label="OpenStreetMap" />
+          <LegendItem source="saved" label="Saved Record" />
+        </div>
+
+        <div className="record-map-toggles">
+          <label>
+            <input
+              type="checkbox"
+              checked={hideMatchedPins}
+              onChange={event =>
+                setHideMatchedPins(event.target.checked)
+              }
+            />
+            Hide matched raw pins
+          </label>
+
+          <label>
+            <input
+              type="checkbox"
+              checked={showSavedPins}
+              onChange={event =>
+                setShowSavedPins(event.target.checked)
+              }
+            />
+            Show saved pins
+          </label>
+        </div>
+      </div>
+
       <div className="record-map-frame">
         <LeafletMap
           records={visibleRecords}
-          onSelectRecord={
-            selectedSource === "saved"
+          onSelectRecord={handleSelectRecord}
+          onAddSourceRecord={
+            selectedRecord?.mapSource === "saved"
               ? undefined
-              : handleSelectRecord
+              : handleAddSourceRecord
           }
+          masterRecordId={selectedRecord?.id}
+          sourceRecordIds={sourceRecords.map(record => record.id)}
+          initialView={mapView}
+          onViewChange={onMapViewChange}
         />
       </div>
-
-      {selectedSource === "saved" && (
-        <p className="record-map-help">
-          Saved records are shown for reference. Select a raw source filter
-          to create a new master record from a map pin.
-        </p>
-      )}
 
       {saveSuccess && (
         <div className="record-map-notice success">
@@ -194,10 +302,15 @@ function RecordMap({
         >
           <div className="record-map-editor-header">
             <div>
-              <h2>Edit new master record</h2>
+              <h2>
+                {selectedRecord.mapSource === "saved"
+                  ? "Edit saved record"
+                  : "Edit new master record"}
+              </h2>
               <p>
-                Changes are saved as a new record in data/saved. The raw
-                source data is never overwritten.
+                {selectedRecord.mapSource === "saved"
+                  ? "Changes update this record in data/saved."
+                  : "Changes are saved as a new record in data/saved. The raw source data is never overwritten."}
               </p>
             </div>
 
@@ -215,10 +328,59 @@ function RecordMap({
             onChange={updateSelectedRecord}
             onSave={saveSelectedRecord}
             saving={saving}
+            sourceName={
+              selectedRecord.mapSource === "saved"
+                ? "Saved record"
+                : undefined
+            }
+            saveLabel={
+              selectedRecord.mapSource === "saved"
+                ? "Save Changes"
+                : "Save Record"
+            }
           />
+
+          {selectedRecord.mapSource !== "saved" && (
+            <section className="record-map-source-records">
+              <div className="source-records-header">
+                <div>
+                  <h2>Source Records</h2>
+                  <p>
+                    Use “Add as source” in another raw map pin’s popup to
+                    include it in this match.
+                  </p>
+                </div>
+              </div>
+
+              {sourceRecords.length === 0 ? (
+                <div className="record-map-source-empty">
+                  No additional source records selected.
+                </div>
+              ) : (
+                <div className="source-record-list">
+                  {sourceRecords.map(record => (
+                    <SourceRecord
+                      key={record.id}
+                      record={record}
+                      onRemove={removeSourceRecord}
+                    />
+                  ))}
+                </div>
+              )}
+            </section>
+          )}
         </section>
       )}
     </section>
+  );
+}
+
+function LegendItem({ source, label }) {
+  return (
+    <span className="record-map-legend-item">
+      <i className={`record-map-legend-pin ${source}`} />
+      {label}
+    </span>
   );
 }
 

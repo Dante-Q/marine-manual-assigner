@@ -20,6 +20,9 @@ function App() {
   const [initialMasterRecord, setInitialMasterRecord] =
     useState(null);
 
+  const [recordMapView, setRecordMapView] =
+    useState(null);
+
   const [loading, setLoading] =
     useState(true);
 
@@ -165,6 +168,8 @@ function App() {
             records={records}
             savedRecords={savedRecords}
             setSavedRecords={setSavedRecords}
+            mapView={recordMapView}
+            onMapViewChange={setRecordMapView}
           />
         )}
 

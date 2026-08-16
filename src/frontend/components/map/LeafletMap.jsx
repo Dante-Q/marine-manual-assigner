@@ -56,11 +56,20 @@ function loadLeaflet() {
   return leafletPromise;
 }
 
-function LeafletMap({ records, onSelectRecord }) {
+function LeafletMap({
+  records,
+  onSelectRecord,
+  onAddSourceRecord,
+  masterRecordId,
+  sourceRecordIds = [],
+  initialView,
+  onViewChange
+}) {
   const containerRef = useRef(null);
   const mapRef = useRef(null);
   const markerLayerRef = useRef(null);
   const leafletRef = useRef(null);
+  const hasInitializedViewRef = useRef(false);
   const [ready, setReady] = useState(false);
   const [error, setError] = useState(null);
 
@@ -75,7 +84,17 @@ function LeafletMap({ records, onSelectRecord }) {
 
         const map = L.map(containerRef.current, {
           scrollWheelZoom: true
-        }).setView([54.5, -3], 6);
+        });
+
+        if (initialView) {
+          map.setView(
+            [initialView.latitude, initialView.longitude],
+            initialView.zoom
+          );
+          hasInitializedViewRef.current = true;
+        } else {
+          map.setView([54.5, -3], 6);
+        }
 
         L.tileLayer(
           "https://tile.openstreetmap.org/{z}/{x}/{y}.png",
@@ -89,6 +108,16 @@ function LeafletMap({ records, onSelectRecord }) {
         leafletRef.current = L;
         mapRef.current = map;
         markerLayerRef.current = L.layerGroup().addTo(map);
+
+        map.on("moveend", () => {
+          const center = map.getCenter();
+
+          onViewChange?.({
+            latitude: center.lat,
+            longitude: center.lng,
+            zoom: map.getZoom()
+          });
+        });
         setReady(true);
       })
       .catch(loadError => {
@@ -116,27 +145,73 @@ function LeafletMap({ records, onSelectRecord }) {
     markers.clearLayers();
 
     const bounds = [];
-
     for (const record of records) {
       const latitude = Number(record.latitude);
       const longitude = Number(record.longitude);
 
-      const marker = L.marker([latitude, longitude]);
-      marker.bindPopup(createPopup(record));
-      marker.on("click", () => onSelectRecord?.(record));
+      const marker = L.marker(
+        [latitude, longitude],
+        {
+          icon: createMarkerIcon(
+            L,
+            record.mapSource ?? record.source
+          )
+        }
+      );
+      const canAddAsSource =
+        Boolean(onAddSourceRecord) &&
+        record.mapSource !== "saved" &&
+        record.id !== masterRecordId &&
+        !sourceRecordIds.includes(record.id);
+
+      marker.bindPopup(createPopup(record, canAddAsSource));
+      marker.on("popupopen", event => {
+        const editButton =
+          event.popup
+            .getElement()
+            ?.querySelector(".record-map-edit-button");
+
+        editButton?.addEventListener("click", clickEvent => {
+          clickEvent.preventDefault();
+          clickEvent.stopPropagation();
+          onSelectRecord?.(record);
+        });
+
+        const addSourceButton =
+          event.popup
+            .getElement()
+            ?.querySelector(".record-map-add-source-button");
+
+        addSourceButton?.addEventListener("click", clickEvent => {
+          clickEvent.preventDefault();
+          clickEvent.stopPropagation();
+          onAddSourceRecord?.(record);
+        });
+      });
       marker.addTo(markers);
       bounds.push([latitude, longitude]);
     }
 
-    if (bounds.length === 1) {
-      mapRef.current.setView(bounds[0], 13);
-    } else if (bounds.length > 1) {
-      mapRef.current.fitBounds(bounds, {
-        padding: [36, 36],
-        maxZoom: 13
-      });
+    if (!hasInitializedViewRef.current) {
+      if (bounds.length === 1) {
+        mapRef.current.setView(bounds[0], 13);
+      } else if (bounds.length > 1) {
+        mapRef.current.fitBounds(bounds, {
+          padding: [36, 36],
+          maxZoom: 13
+        });
+      }
+
+      hasInitializedViewRef.current = true;
     }
-  }, [records, ready, onSelectRecord]);
+  }, [
+    records,
+    ready,
+    onSelectRecord,
+    onAddSourceRecord,
+    masterRecordId,
+    sourceRecordIds
+  ]);
 
   if (error) {
     return <div className="record-map-error">{error}</div>;
@@ -145,9 +220,28 @@ function LeafletMap({ records, onSelectRecord }) {
   return <div ref={containerRef} className="record-map-canvas" />;
 }
 
-function createPopup(record) {
+function createMarkerIcon(L, source) {
+  const sourceClass = {
+    tyha: "tyha",
+    "marinas-com": "marinas-com",
+    osm: "osm",
+    saved: "saved"
+  }[source] ?? "default";
+
+  return L.divIcon({
+    className: "record-map-marker",
+    html: `<span class="record-map-pin ${sourceClass}"></span>`,
+    iconSize: [24, 30],
+    iconAnchor: [12, 30],
+    popupAnchor: [0, -30]
+  });
+}
+
+function createPopup(record, canAddAsSource) {
   const name = escapeHtml(record.name || "Unnamed marina");
-  const source = escapeHtml(getSourceName(record.source));
+  const source = escapeHtml(
+    getSourceName(record.mapSource ?? record.source)
+  );
   const address = escapeHtml(formatAddress(record.address));
 
   return `
@@ -155,6 +249,14 @@ function createPopup(record) {
       <strong>${name}</strong>
       <span>${source}</span>
       ${address ? `<p>${address}</p>` : ""}
+      <button type="button" class="record-map-edit-button">
+        Edit record
+      </button>
+      ${canAddAsSource ? `
+        <button type="button" class="record-map-add-source-button">
+          Add as source
+        </button>
+      ` : ""}
     </div>
   `;
 }

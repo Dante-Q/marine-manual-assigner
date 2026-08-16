@@ -792,6 +792,80 @@ a:hover {
   margin-bottom: 16px;
 }
 
+.record-map-legend {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 14px;
+  color: var(--text-secondary);
+  font-size: 11px;
+}
+
+.record-map-controls {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 12px 20px;
+  margin: -6px 0 14px;
+}
+
+.record-map-toggles {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px;
+}
+
+.record-map-toggles label {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  color: var(--text-secondary);
+  font-size: 11px;
+  cursor: pointer;
+}
+
+.record-map-toggles input {
+  width: 14px;
+  height: 14px;
+  margin: 0;
+  accent-color: var(--blue);
+  cursor: pointer;
+}
+
+.record-map-legend-item {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.record-map-legend-pin {
+  display: inline-block;
+  width: 10px;
+  height: 10px;
+  border-radius: 50% 50% 50% 0;
+  transform: rotate(-45deg);
+}
+
+.record-map-legend-pin.tyha,
+.record-map-pin.tyha {
+  background: #20b86a;
+}
+
+.record-map-legend-pin.marinas-com,
+.record-map-pin.marinas-com {
+  background: #f59e0b;
+}
+
+.record-map-legend-pin.osm,
+.record-map-pin.osm {
+  background: #a855f7;
+}
+
+.record-map-legend-pin.saved,
+.record-map-pin.saved {
+  background: #ec4899;
+}
+
 .record-map-filter {
   display: inline-flex;
   align-items: center;
@@ -855,6 +929,35 @@ a:hover {
   background: var(--bg-secondary);
 }
 
+.record-map-marker {
+  background: transparent;
+  border: 0;
+}
+
+.record-map-pin {
+  position: relative;
+  display: block;
+  width: 22px;
+  height: 22px;
+
+  border: 2px solid rgba(255, 255, 255, 0.95);
+  border-radius: 50% 50% 50% 0;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.35);
+  transform: rotate(-45deg);
+}
+
+.record-map-pin::after {
+  position: absolute;
+  top: 6px;
+  left: 6px;
+  width: 6px;
+  height: 6px;
+
+  background: white;
+  border-radius: 50%;
+  content: "";
+}
+
 .record-map-error {
   display: grid;
   width: 100%;
@@ -914,6 +1017,19 @@ a:hover {
   line-height: 1.5;
 }
 
+.record-map-source-records {
+  margin-top: 22px;
+}
+
+.record-map-source-empty {
+  padding: 20px;
+  background: var(--panel);
+  border: 1px dashed var(--border-light);
+  border-radius: var(--radius);
+  color: var(--text-muted);
+  font-size: 13px;
+}
+
 .record-map-popup strong,
 .record-map-popup span {
   display: block;
@@ -934,6 +1050,43 @@ a:hover {
   color: #4a5b72;
   font-size: 11px;
   line-height: 1.4;
+}
+
+.record-map-edit-button {
+  margin-top: 11px;
+  padding: 6px 9px;
+
+  background: #1683ff;
+  border: 1px solid #1683ff;
+  border-radius: 4px;
+  color: white;
+  font-size: 11px;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.record-map-edit-button:hover {
+  background: #3294ff;
+  border-color: #3294ff;
+}
+
+.record-map-add-source-button {
+  margin-top: 11px;
+  margin-left: 6px;
+  padding: 6px 9px;
+
+  background: white;
+  border: 1px solid #c8d3df;
+  border-radius: 4px;
+  color: #344861;
+  font-size: 11px;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.record-map-add-source-button:hover {
+  background: #eff5fb;
+  border-color: #9db4cf;
 }
 
 .matcher-header {

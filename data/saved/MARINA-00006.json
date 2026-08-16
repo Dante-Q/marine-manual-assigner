@@ -1,0 +1,35 @@
+{
+  "id": "MARINA-00006",
+  "name": "Deganwy Marina",
+  "description": null,
+  "latitude": 53.2912166,
+  "longitude": -3.8274402,
+  "address": {
+    "street": null,
+    "city": null,
+    "postcode": null,
+    "country": null
+  },
+  "phone": "01492 576 888",
+  "email": null,
+  "website": null,
+  "berths": null,
+  "facilities": [],
+  "images": [],
+  "sourceRecords": [
+    {
+      "id": "osm:way:124873310",
+      "source": "osm"
+    },
+    {
+      "id": "tyha:492",
+      "source": "tyha"
+    },
+    {
+      "id": "marinas-com:wgc5zq",
+      "source": "marinas-com"
+    }
+  ],
+  "createdAt": "2026-08-16T16:26:05.637Z",
+  "updatedAt": "2026-08-16T16:26:05.637Z"
+}

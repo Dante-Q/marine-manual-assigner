@@ -6,7 +6,9 @@ function MasterRecord({
   record,
   onChange,
   onSave,
-  saving = false
+  saving = false,
+  sourceName,
+  saveLabel = "Save Record"
 }) {
   return (
     <section className="master-record">
@@ -36,7 +38,7 @@ function MasterRecord({
         >
           {saving
             ? "Saving..."
-            : "Save Record"}
+            : saveLabel}
         </button>
 
       </div>
@@ -140,7 +142,7 @@ function MasterRecord({
           </span>
 
           <strong>
-            {getSourceName(record.source)}
+            {sourceName ?? getSourceName(record.source)}
           </strong>
         </div>
 
