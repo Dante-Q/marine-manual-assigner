@@ -1332,3 +1332,35 @@ a:hover {
     gap: 4px;
   }
 }
+
+.record-item-meta {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+}
+
+.matched-badge {
+  display: inline-flex;
+  align-items: center;
+
+  padding: 3px 8px;
+
+  background: rgba(46, 204, 113, 0.14);
+  border: 1px solid rgba(46, 204, 113, 0.35);
+  border-radius: 5px;
+
+  color: #5ee38a;
+
+  font-size: 11px;
+  font-weight: 650;
+  letter-spacing: 0.2px;
+
+  white-space: nowrap;
+}
+
+.detail-source-row {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}

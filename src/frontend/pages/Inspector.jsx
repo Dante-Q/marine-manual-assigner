@@ -2,8 +2,7 @@ import { useMemo, useState } from "react";
 
 function Inspector({
   records,
-  matchedRecords,
-  setMatchedRecords
+  savedRecords
 }) {
   const [selectedSource, setSelectedSource] =
     useState("all");
@@ -16,7 +15,9 @@ function Inspector({
 
   const counts = useMemo(() => {
     return {
-      all: records.length,
+      all:
+        records.length +
+        savedRecords.length,
 
       tyha: records.filter(
         record => record.source === "tyha"
@@ -29,14 +30,74 @@ function Inspector({
 
       osm: records.filter(
         record => record.source === "osm"
-      ).length
+      ).length,
+
+      saved: savedRecords.length
     };
-  }, [records]);
+  }, [
+    records,
+    savedRecords
+  ]);
+
+  /*
+   * Build a Set containing every raw source-record
+   * ID that has already been used in a saved master.
+   *
+   * Saved records are the source of truth.
+   * Raw records are never modified.
+   */
+  const matchedRecordIds = useMemo(() => {
+    const ids = new Set();
+
+    for (const savedRecord of savedRecords) {
+      for (
+        const sourceRecord
+        of savedRecord.sourceRecords ?? []
+      ) {
+        if (sourceRecord.id) {
+          ids.add(sourceRecord.id);
+        }
+      }
+    }
+
+    return ids;
+  }, [savedRecords]);
 
   const filteredRecords = useMemo(() => {
     const query =
       search.trim().toLowerCase();
 
+    /*
+     * Saved Records
+     */
+    if (selectedSource === "saved") {
+      return savedRecords.filter(record => {
+        if (!query) {
+          return true;
+        }
+
+        const name =
+          record.name?.toLowerCase() ?? "";
+
+        const address =
+          JSON.stringify(
+            record.address
+          ).toLowerCase();
+
+        const id =
+          record.id?.toLowerCase() ?? "";
+
+        return (
+          name.includes(query) ||
+          address.includes(query) ||
+          id.includes(query)
+        );
+      });
+    }
+
+    /*
+     * Raw Records
+     */
     return records.filter(record => {
       if (
         selectedSource !== "all" &&
@@ -64,6 +125,7 @@ function Inspector({
     });
   }, [
     records,
+    savedRecords,
     selectedSource,
     search
   ]);
@@ -71,32 +133,15 @@ function Inspector({
   function handleSourceChange(source) {
     setSelectedSource(source);
     setSelectedRecord(null);
+    setSearch("");
   }
 
   function isMatched(recordId) {
-    return matchedRecords.some(
-      record => record.id === recordId
-    );
+    return matchedRecordIds.has(recordId);
   }
 
-  function addToMatcher(record) {
-    if (isMatched(record.id)) {
-      return;
-    }
-
-    setMatchedRecords(current => [
-      ...current,
-      record
-    ]);
-  }
-
-  function removeFromMatcher(recordId) {
-    setMatchedRecords(current =>
-      current.filter(
-        record => record.id !== recordId
-      )
-    );
-  }
+  const showingSaved =
+    selectedSource === "saved";
 
   return (
     <div className="inspector">
@@ -137,6 +182,14 @@ function Inspector({
             source="osm"
             label="OSM"
             count={counts.osm}
+            selected={selectedSource}
+            onClick={handleSourceChange}
+          />
+
+          <SourceButton
+            source="saved"
+            label="Saved Records"
+            count={counts.saved}
             selected={selectedSource}
             onClick={handleSourceChange}
           />
@@ -183,40 +236,73 @@ function Inspector({
                 No records found.
               </div>
             ) : (
-              filteredRecords.map(record => (
-                <button
-                  key={record.id}
-                  className={`record-item ${
-                    selectedRecord?.id === record.id
-                      ? "selected"
-                      : ""
-                  }`}
-                  onClick={() =>
-                    setSelectedRecord(record)
-                  }
-                >
+              filteredRecords.map(record => {
 
-                  <div className="record-item-title">
+                const matched =
+                  !showingSaved &&
+                  isMatched(record.id);
 
-                    <strong>
-                      {record.name ||
-                        "Unnamed marina"}
-                    </strong>
+                return (
+                  <button
+                    key={record.id}
+                    className={`record-item ${
+                      selectedRecord?.id === record.id
+                        ? "selected"
+                        : ""
+                    } ${
+                      matched
+                        ? "matched"
+                        : ""
+                    } ${
+                      showingSaved
+                        ? "saved-record"
+                        : ""
+                    }`}
+                    onClick={() =>
+                      setSelectedRecord(record)
+                    }
+                  >
 
-                    <span className="source-label">
-                      {getSourceName(
-                        record.source
+                    <div className="record-item-title">
+
+                      <strong>
+                        {record.name ||
+                          "Unnamed marina"}
+                      </strong>
+
+                      <span className="source-label">
+                        {showingSaved
+                          ? "Saved"
+                          : getSourceName(
+                              record.source
+                            )}
+                      </span>
+
+                    </div>
+
+                    <div className="record-item-meta">
+
+                      <span>
+                        {formatLocation(record)}
+                      </span>
+
+                      {showingSaved ? (
+                        <span className="saved-badge">
+                          {record.id}
+                        </span>
+                      ) : (
+                        matched && (
+                          <span className="matched-badge">
+                            Matched
+                          </span>
+                        )
                       )}
-                    </span>
 
-                  </div>
+                    </div>
 
-                  <span>
-                    {formatLocation(record)}
-                  </span>
-
-                </button>
-              ))
+                  </button>
+                );
+              })
             )}
 
           </div>
@@ -224,14 +310,18 @@ function Inspector({
           <div className="record-detail">
 
             {selectedRecord ? (
-              <RecordDetail
-                record={selectedRecord}
-                matched={isMatched(
-                  selectedRecord.id
-                )}
-                onAdd={addToMatcher}
-                onRemove={removeFromMatcher}
-              />
+              showingSaved ? (
+                <SavedRecordDetail
+                  record={selectedRecord}
+                />
+              ) : (
+                <RecordDetail
+                  record={selectedRecord}
+                  matched={isMatched(
+                    selectedRecord.id
+                  )}
+                />
+              )
             ) : (
               <div className="empty-state">
 
@@ -288,9 +378,7 @@ function SourceButton({
 
 function RecordDetail({
   record,
-  matched,
-  onAdd,
-  onRemove
+  matched
 }) {
   return (
     <>
@@ -298,38 +386,24 @@ function RecordDetail({
 
         <div>
 
-          <span className="source-label">
-            {getSourceName(record.source)}
-          </span>
+          <div className="detail-source-row">
+
+            <span className="source-label">
+              {getSourceName(record.source)}
+            </span>
+
+            {matched && (
+              <span className="matched-badge">
+                Matched
+              </span>
+            )}
+
+          </div>
 
           <h2>
             {record.name ||
               "Unnamed marina"}
           </h2>
-
-        </div>
-
-        <div className="detail-actions">
-
-          {matched ? (
-            <button
-              className="remove-record-button"
-              onClick={() =>
-                onRemove(record.id)
-              }
-            >
-              Remove from Match
-            </button>
-          ) : (
-            <button
-              className="primary-button"
-              onClick={() =>
-                onAdd(record)
-              }
-            >
-              Add to Matcher
-            </button>
-          )}
 
         </div>
 
@@ -425,6 +499,167 @@ function RecordDetail({
           <span className="raw-description">
             Normalized record including
             original source data
+          </span>
+
+        </div>
+
+        <pre>
+          {JSON.stringify(
+            record,
+            null,
+            2
+          )}
+        </pre>
+
+      </div>
+    </>
+  );
+}
+
+function SavedRecordDetail({
+  record
+}) {
+  return (
+    <>
+      <div className="detail-header">
+
+        <div>
+
+          <div className="detail-source-row">
+
+            <span className="source-label">
+              Saved Record
+            </span>
+
+            <span className="saved-badge">
+              {record.id}
+            </span>
+
+          </div>
+
+          <h2>
+            {record.name ||
+              "Unnamed marina"}
+          </h2>
+
+        </div>
+
+      </div>
+
+      <div className="detail-grid">
+
+        <DetailField
+          label="Master ID"
+          value={record.id}
+        />
+
+        <DetailField
+          label="Name"
+          value={record.name}
+        />
+
+        <DetailField
+          label="Description"
+          value={record.description}
+        />
+
+        <DetailField
+          label="Location"
+          value={formatCoordinates(
+            record.latitude,
+            record.longitude
+          )}
+        />
+
+        <DetailField
+          label="Address"
+          value={formatAddress(
+            record.address
+          )}
+        />
+
+        <DetailField
+          label="Phone"
+          value={record.phone}
+        />
+
+        <DetailField
+          label="Email"
+          value={record.email}
+        />
+
+        <DetailField
+          label="Website"
+          value={record.website}
+        />
+
+        <DetailField
+          label="Berths"
+          value={record.berths}
+        />
+
+        <DetailField
+          label="Facilities"
+          value={formatJsonValue(
+            record.facilities
+          )}
+        />
+
+        <DetailField
+          label="Images"
+          value={formatJsonValue(
+            record.images
+          )}
+        />
+
+        <DetailField
+          label="Created"
+          value={record.createdAt}
+        />
+
+        <DetailField
+          label="Updated"
+          value={record.updatedAt}
+        />
+
+      </div>
+
+      <div className="raw-section">
+
+        <div className="raw-section-header">
+
+          <h3>
+            Source Records
+          </h3>
+
+          <span className="raw-description">
+            Raw records used to create this
+            master record
+          </span>
+
+        </div>
+
+        <pre>
+          {JSON.stringify(
+            record.sourceRecords ?? [],
+            null,
+            2
+          )}
+        </pre>
+
+      </div>
+
+      <div className="raw-section">
+
+        <div className="raw-section-header">
+
+          <h3>
+            Complete Saved Record
+          </h3>
+
+          <span className="raw-description">
+            Master record stored in
+            data/saved
           </span>
 
         </div>
@@ -604,7 +839,8 @@ function getSourceName(source) {
     all: "All Records",
     tyha: "TYHA",
     "marinas-com": "Marinas.com",
-    osm: "OpenStreetMap"
+    osm: "OpenStreetMap",
+    saved: "Saved Records"
   };
 
   return (

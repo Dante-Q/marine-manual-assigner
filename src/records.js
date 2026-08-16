@@ -313,3 +313,42 @@ export function loadRecords() {
 
   return records;
 }
+export function loadSavedRecords() {
+  const savedDir = path.join(
+    __dirname,
+    "../data/saved"
+  );
+
+  if (!fs.existsSync(savedDir)) {
+    return [];
+  }
+
+  return fs
+    .readdirSync(savedDir)
+    .filter(file =>
+      /^MARINA-\d{5}\.json$/i.test(file)
+    )
+    .map(file => {
+      const filePath = path.join(
+        savedDir,
+        file
+      );
+
+      try {
+        return JSON.parse(
+          fs.readFileSync(
+            filePath,
+            "utf8"
+          )
+        );
+      } catch (error) {
+        console.error(
+          `Failed to read saved record ${filePath}:`,
+          error.message
+        );
+
+        return null;
+      }
+    })
+    .filter(Boolean);
+}

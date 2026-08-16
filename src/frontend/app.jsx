@@ -1,22 +1,40 @@
 import { useEffect, useState } from "react";
-import { fetchRecords } from "./api/api.js";
+
+import {
+  fetchRecords,
+  fetchSavedRecords
+} from "./api/api.js";
+
 import Inspector from "./pages/Inspector.jsx";
 import Matcher from "./pages/Matcher.jsx";
 
 function App() {
   const [records, setRecords] = useState([]);
-  const [matchedRecords, setMatchedRecords] = useState([]);
-  const [page, setPage] = useState("inspector");
+  const [savedRecords, setSavedRecords] =
+    useState([]);
 
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState(null);
+  const [page, setPage] =
+    useState("inspector");
+
+  const [loading, setLoading] =
+    useState(true);
+
+  const [error, setError] =
+    useState(null);
 
   useEffect(() => {
-    async function loadRecords() {
+    async function loadApplicationData() {
       try {
-        const data = await fetchRecords();
+        const [
+          rawRecords,
+          saved
+        ] = await Promise.all([
+          fetchRecords(),
+          fetchSavedRecords()
+        ]);
 
-        setRecords(data);
+        setRecords(rawRecords);
+        setSavedRecords(saved);
       } catch (err) {
         console.error(err);
 
@@ -28,7 +46,7 @@ function App() {
       }
     }
 
-    loadRecords();
+    loadApplicationData();
   }, []);
 
   if (loading) {
@@ -100,16 +118,16 @@ function App() {
         {page === "inspector" && (
           <Inspector
             records={records}
-            matchedRecords={matchedRecords}
-            setMatchedRecords={setMatchedRecords}
+            savedRecords={savedRecords}
+            setSavedRecords={setSavedRecords}
           />
         )}
 
         {page === "matcher" && (
           <Matcher
             records={records}
-            matchedRecords={matchedRecords}
-            setMatchedRecords={setMatchedRecords}
+            savedRecords={savedRecords}
+            setSavedRecords={setSavedRecords}
           />
         )}
 

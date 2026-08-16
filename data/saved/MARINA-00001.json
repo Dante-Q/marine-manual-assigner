@@ -1,0 +1,43 @@
+{
+  "id": "MARINA-00001",
+  "name": "Pwllheli Marina",
+  "description": "A large marina on the north coast of Wales offering berthing, facilities and services for visiting and resident boats.",
+  "latitude": 52.8892,
+  "longitude": -4.4215,
+  "address": {
+    "street": "South Beach",
+    "city": "Pwllheli",
+    "postcode": "LL53 5YT",
+    "country": "United Kingdom"
+  },
+  "phone": "+44 1758 613983",
+  "email": "example@pwllhelimarina.example",
+  "website": "https://example.com",
+  "berths": 400,
+  "facilities": [
+    "Electricity",
+    "Water",
+    "Fuel",
+    "Showers",
+    "Toilets",
+    "Laundry",
+    "WiFi"
+  ],
+  "images": [],
+  "sourceRecords": [
+    {
+      "id": "tyha:example-pwllheli",
+      "source": "tyha"
+    },
+    {
+      "id": "marinas-com:example-pwllheli",
+      "source": "marinas-com"
+    },
+    {
+      "id": "osm:node:123456789",
+      "source": "osm"
+    }
+  ],
+  "createdAt": "2026-08-16T12:00:00.000Z",
+  "updatedAt": "2026-08-16T12:00:00.000Z"
+}
