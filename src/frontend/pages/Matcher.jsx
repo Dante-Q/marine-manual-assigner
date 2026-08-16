@@ -16,10 +16,15 @@ import SourceRecord
 function Matcher({
   records,
   savedRecords,
-  setSavedRecords
+  setSavedRecords,
+  initialMasterRecord
 }) {
   const [masterRecord, setMasterRecord] =
-    useState(null);
+    useState(
+      initialMasterRecord
+        ? { ...initialMasterRecord }
+        : null
+    );
 
   const [sourceRecords, setSourceRecords] =
     useState([]);
@@ -30,11 +35,31 @@ function Matcher({
   const [search, setSearch] =
     useState("");
 
+  const [showMatchedRecords, setShowMatchedRecords] =
+    useState(false);
+
   const [saving, setSaving] =
     useState(false);
 
   const [error, setError] =
     useState(null);
+
+  const matchedRecordIds = useMemo(() => {
+    const ids = new Set();
+
+    for (const savedRecord of savedRecords) {
+      for (
+        const sourceRecord
+        of savedRecord.sourceRecords ?? []
+      ) {
+        if (sourceRecord.id) {
+          ids.add(sourceRecord.id);
+        }
+      }
+    }
+
+    return ids;
+  }, [savedRecords]);
 
   const searchResults = useMemo(() => {
     const query =
@@ -67,6 +92,13 @@ function Matcher({
         return false;
       }
 
+      if (
+        !showMatchedRecords &&
+        matchedRecordIds.has(record.id)
+      ) {
+        return false;
+      }
+
       const name =
         record.name?.toLowerCase() ?? "";
 
@@ -92,7 +124,9 @@ function Matcher({
     records,
     masterRecord,
     sourceRecords,
-    search
+    search,
+    showMatchedRecords,
+    matchedRecordIds
   ]);
 
   /*
@@ -299,6 +333,11 @@ async function handleSave() {
             search={search}
             setSearch={setSearch}
             results={searchResults}
+            showMatchedRecords={showMatchedRecords}
+            setShowMatchedRecords={setShowMatchedRecords}
+            isMatched={record =>
+              matchedRecordIds.has(record.id)
+            }
             onAdd={addRecord}
             onClose={closeAddRecord}
           />
@@ -387,6 +426,11 @@ async function handleSave() {
             search={search}
             setSearch={setSearch}
             results={searchResults}
+            showMatchedRecords={showMatchedRecords}
+            setShowMatchedRecords={setShowMatchedRecords}
+            isMatched={record =>
+              matchedRecordIds.has(record.id)
+            }
             onAdd={addRecord}
             onClose={closeAddRecord}
           />

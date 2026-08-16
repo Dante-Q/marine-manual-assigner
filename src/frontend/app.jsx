@@ -16,6 +16,9 @@ function App() {
   const [page, setPage] =
     useState("inspector");
 
+  const [initialMasterRecord, setInitialMasterRecord] =
+    useState(null);
+
   const [loading, setLoading] =
     useState(true);
 
@@ -90,7 +93,10 @@ function App() {
                 : ""
             }`}
             onClick={() =>
-              setPage("inspector")
+              {
+                setInitialMasterRecord(null);
+                setPage("inspector");
+              }
             }
           >
             Inspector
@@ -103,7 +109,10 @@ function App() {
                 : ""
             }`}
             onClick={() =>
-              setPage("matcher")
+              {
+                setInitialMasterRecord(null);
+                setPage("matcher");
+              }
             }
           >
             Matcher
@@ -120,6 +129,10 @@ function App() {
             records={records}
             savedRecords={savedRecords}
             setSavedRecords={setSavedRecords}
+            onCreateMaster={record => {
+              setInitialMasterRecord(record);
+              setPage("matcher");
+            }}
           />
         )}
 
@@ -128,6 +141,7 @@ function App() {
             records={records}
             savedRecords={savedRecords}
             setSavedRecords={setSavedRecords}
+            initialMasterRecord={initialMasterRecord}
           />
         )}
 

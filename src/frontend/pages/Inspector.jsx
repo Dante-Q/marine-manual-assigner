@@ -2,7 +2,8 @@ import { useMemo, useState } from "react";
 
 function Inspector({
   records,
-  savedRecords
+  savedRecords,
+  onCreateMaster
 }) {
   const [selectedSource, setSelectedSource] =
     useState("all");
@@ -13,11 +14,12 @@ function Inspector({
   const [search, setSearch] =
     useState("");
 
+  const [matchFilter, setMatchFilter] =
+    useState("all");
+
   const counts = useMemo(() => {
     return {
-      all:
-        records.length +
-        savedRecords.length,
+      all: records.length,
 
       tyha: records.filter(
         record => record.source === "tyha"
@@ -61,7 +63,9 @@ function Inspector({
     }
 
     return ids;
-  }, [savedRecords]);
+  }, [
+    savedRecords
+  ]);
 
   const filteredRecords = useMemo(() => {
     const query =
@@ -99,6 +103,9 @@ function Inspector({
      * Raw Records
      */
     return records.filter(record => {
+      /*
+       * Source filter
+       */
       if (
         selectedSource !== "all" &&
         record.source !== selectedSource
@@ -106,6 +113,37 @@ function Inspector({
         return false;
       }
 
+      /*
+       * Match filter.
+       *
+       * This is intentionally only applied
+       * when viewing All Records.
+       */
+      if (
+        selectedSource === "all" &&
+        matchFilter !== "all"
+      ) {
+        const matched =
+          matchedRecordIds.has(record.id);
+
+        if (
+          matchFilter === "matched" &&
+          !matched
+        ) {
+          return false;
+        }
+
+        if (
+          matchFilter === "unmatched" &&
+          matched
+        ) {
+          return false;
+        }
+      }
+
+      /*
+       * Search filter
+       */
       if (!query) {
         return true;
       }
@@ -118,15 +156,25 @@ function Inspector({
           record.address
         ).toLowerCase();
 
+      const id =
+        record.id?.toLowerCase() ?? "";
+
+      const source =
+        record.source?.toLowerCase() ?? "";
+
       return (
         name.includes(query) ||
-        address.includes(query)
+        address.includes(query) ||
+        id.includes(query) ||
+        source.includes(query)
       );
     });
   }, [
     records,
     savedRecords,
     selectedSource,
+    matchFilter,
+    matchedRecordIds,
     search
   ]);
 
@@ -134,6 +182,20 @@ function Inspector({
     setSelectedSource(source);
     setSelectedRecord(null);
     setSearch("");
+
+    /*
+     * Reset the match filter when leaving
+     * All Records so it doesn't unexpectedly
+     * affect another source view.
+     */
+    if (source !== "all") {
+      setMatchFilter("all");
+    }
+  }
+
+  function handleMatchFilterChange(filter) {
+    setMatchFilter(filter);
+    setSelectedRecord(null);
   }
 
   function isMatched(recordId) {
@@ -142,6 +204,9 @@ function Inspector({
 
   const showingSaved =
     selectedSource === "saved";
+
+  const showingAll =
+    selectedSource === "all";
 
   return (
     <div className="inspector">
@@ -226,6 +291,55 @@ function Inspector({
           />
 
         </div>
+
+        {showingAll && (
+          <div className="record-filters">
+
+            <button
+              className={`filter-button ${
+                matchFilter === "all"
+                  ? "active"
+                  : ""
+              }`}
+              onClick={() =>
+                handleMatchFilterChange("all")
+              }
+            >
+              All
+            </button>
+
+            <button
+              className={`filter-button ${
+                matchFilter === "matched"
+                  ? "active"
+                  : ""
+              }`}
+              onClick={() =>
+                handleMatchFilterChange(
+                  "matched"
+                )
+              }
+            >
+              Matched
+            </button>
+
+            <button
+              className={`filter-button ${
+                matchFilter === "unmatched"
+                  ? "active"
+                  : ""
+              }`}
+              onClick={() =>
+                handleMatchFilterChange(
+                  "unmatched"
+                )
+              }
+            >
+              Unmatched
+            </button>
+
+          </div>
+        )}
 
         <div className="content">
 
@@ -320,6 +434,7 @@ function Inspector({
                   matched={isMatched(
                     selectedRecord.id
                   )}
+                  onCreateMaster={onCreateMaster}
                 />
               )
             ) : (
@@ -378,7 +493,8 @@ function SourceButton({
 
 function RecordDetail({
   record,
-  matched
+  matched,
+  onCreateMaster
 }) {
   return (
     <>
@@ -404,6 +520,17 @@ function RecordDetail({
             {record.name ||
               "Unnamed marina"}
           </h2>
+
+        </div>
+
+        <div className="detail-actions">
+
+          <button
+            className="primary-button"
+            onClick={() => onCreateMaster(record)}
+          >
+            Create Master Record
+          </button>
 
         </div>
 

@@ -2,6 +2,9 @@ function RecordSearch({
   search,
   setSearch,
   results,
+  showMatchedRecords,
+  setShowMatchedRecords,
+  isMatched,
   onAdd,
   onClose
 }) {
@@ -42,6 +45,24 @@ function RecordSearch({
         autoFocus
       />
 
+      <label className="matcher-search-toggle">
+
+        <input
+          type="checkbox"
+          checked={showMatchedRecords}
+          onChange={event =>
+            setShowMatchedRecords(
+              event.target.checked
+            )
+          }
+        />
+
+        <span>
+          Show previously matched records
+        </span>
+
+      </label>
+
       <div className="matcher-search-results">
 
         {!search.trim() ? (
@@ -78,6 +99,12 @@ function RecordSearch({
                 <span className="matcher-result-source">
                   {getSourceName(record.source)}
                 </span>
+
+                {isMatched(record) && (
+                  <span className="matched-badge">
+                    Matched
+                  </span>
+                )}
 
                 <span className="matcher-result-id">
                   {record.id}
