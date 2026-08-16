@@ -1164,8 +1164,27 @@ a:hover {
   line-height: 1.4;
 }
 
-.record-map-edit-button {
+.record-map-popup-actions {
+  display: grid;
+  grid-template-columns: repeat(2, 128px);
+  gap: 6px;
   margin-top: 11px;
+}
+
+.record-map-popup-actions button {
+  width: 100%;
+  margin: 0;
+}
+
+.record-map-popup-actions.raw-actions {
+  margin-top: 6px;
+}
+
+.record-map-canvas .leaflet-popup-content {
+  width: 278px !important;
+}
+
+.record-map-edit-button {
   padding: 6px 9px;
 
   background: #1683ff;
@@ -1183,8 +1202,6 @@ a:hover {
 }
 
 .record-map-add-source-button {
-  margin-top: 11px;
-  margin-left: 6px;
   padding: 6px 9px;
 
   background: white;
@@ -1203,8 +1220,6 @@ a:hover {
 
 .record-map-edit-raw-button,
 .record-map-delete-raw-button {
-  margin-top: 7px;
-  margin-left: 6px;
   padding: 5px 8px;
   background: #fff1f1;
   border: 1px solid #ef8585;

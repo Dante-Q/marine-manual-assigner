@@ -411,7 +411,8 @@ function RecordMap({
           records={mapRecords}
           onSelectRecord={handleSelectRecord}
           onAddSourceRecord={
-            selectedRecord?.mapSource === "saved"
+            !selectedRecord ||
+            selectedRecord.mapSource === "saved"
               ? undefined
               : handleAddSourceRecord
           }

@@ -316,17 +316,21 @@ function createPopup(record, canAddAsSource, isRawRecord) {
       <strong>${name}</strong>
       <span>${source}</span>
       ${address ? `<p>${address}</p>` : ""}
-      <button type="button" class="record-map-edit-button">
-        Edit record
-      </button>
-      ${canAddAsSource ? `
-        <button type="button" class="record-map-add-source-button">
-          Add as source
+      <div class="record-map-popup-actions">
+        <button type="button" class="record-map-edit-button">
+          Edit record
         </button>
-      ` : ""}
+        ${canAddAsSource ? `
+          <button type="button" class="record-map-add-source-button">
+            Add source record
+          </button>
+        ` : ""}
+      </div>
       ${isRawRecord ? `
-        <button type="button" class="record-map-edit-raw-button">Edit raw data</button>
-        <button type="button" class="record-map-delete-raw-button">Delete raw data</button>
+        <div class="record-map-popup-actions raw-actions">
+          <button type="button" class="record-map-edit-raw-button">Edit raw data</button>
+          <button type="button" class="record-map-delete-raw-button">Delete raw data</button>
+        </div>
       ` : ""}
     </div>
   `;
