@@ -7,6 +7,7 @@ import {
 
 import Inspector from "./pages/Inspector.jsx";
 import Matcher from "./pages/Matcher.jsx";
+import RecordMap from "./pages/RecordMap.jsx";
 
 function App() {
   const [records, setRecords] = useState([]);
@@ -118,6 +119,20 @@ function App() {
             Matcher
           </button>
 
+          <button
+            className={`nav-button ${
+              page === "record-map"
+                ? "active"
+                : ""
+            }`}
+            onClick={() => {
+              setInitialMasterRecord(null);
+              setPage("record-map");
+            }}
+          >
+            Record Map
+          </button>
+
         </nav>
 
       </header>
@@ -142,6 +157,13 @@ function App() {
             savedRecords={savedRecords}
             setSavedRecords={setSavedRecords}
             initialMasterRecord={initialMasterRecord}
+          />
+        )}
+
+        {page === "record-map" && (
+          <RecordMap
+            records={records}
+            savedRecords={savedRecords}
           />
         )}
 
