@@ -93,3 +93,29 @@ export async function updateMatch(
 
   return response.json();
 }
+
+export async function saveMatch(records) {
+  const response =
+    await fetch("/api/matches", {
+      method: "POST",
+
+      headers: {
+        "Content-Type":
+          "application/json"
+      },
+
+      body: JSON.stringify(records)
+    });
+
+  if (!response.ok) {
+    const data =
+      await response.json();
+
+    throw new Error(
+      data.error ||
+      `Failed to save record: ${response.status}`
+    );
+  }
+
+  return response.json();
+}

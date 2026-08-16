@@ -1,24 +1,67 @@
 import { useMemo, useState } from "react";
 
+import {
+  saveMatch
+} from "../api/api.js";
+
+import RecordSearch
+  from "../components/matcher/RecordSearch.jsx";
+
+import MasterRecord
+  from "../components/matcher/MasterRecord.jsx";
+
+import SourceRecord
+  from "../components/matcher/SourceRecord.jsx";
+
 function Matcher({
   records,
-  matchedRecords,
-  setMatchedRecords
+  savedRecords,
+  setSavedRecords
 }) {
-  const [addingRecord, setAddingRecord] = useState(false);
-  const [search, setSearch] = useState("");
+  const [masterRecord, setMasterRecord] =
+    useState(null);
+
+  const [sourceRecords, setSourceRecords] =
+    useState([]);
+
+  const [addingRecord, setAddingRecord] =
+    useState(false);
+
+  const [search, setSearch] =
+    useState("");
+
+  const [saving, setSaving] =
+    useState(false);
+
+  const [error, setError] =
+    useState(null);
 
   const searchResults = useMemo(() => {
-    const query = search.trim().toLowerCase();
+    const query =
+      search.trim().toLowerCase();
 
     if (!query) {
       return [];
     }
 
     return records.filter(record => {
-      const alreadyAdded = matchedRecords.some(
-        matched => matched.id === record.id
-      );
+      /*
+       * The master record and all source records
+       * already belonging to this match cannot
+       * be added again.
+       */
+      if (
+        masterRecord &&
+        record.id === masterRecord.id
+      ) {
+        return false;
+      }
+
+      const alreadyAdded =
+        sourceRecords.some(
+          sourceRecord =>
+            sourceRecord.id === record.id
+        );
 
       if (alreadyAdded) {
         return false;
@@ -35,21 +78,34 @@ function Matcher({
       const source =
         record.source?.toLowerCase() ?? "";
 
+      const id =
+        record.id?.toLowerCase() ?? "";
+
       return (
         name.includes(query) ||
         address.includes(query) ||
-        source.includes(query)
+        source.includes(query) ||
+        id.includes(query)
       );
     });
   }, [
     records,
-    matchedRecords,
+    masterRecord,
+    sourceRecords,
     search
   ]);
 
+  /*
+   * Start a completely new match.
+   *
+   * We don't create a master record here.
+   * The first source record selected becomes
+   * the master.
+   */
   function openAddRecord() {
     setAddingRecord(true);
     setSearch("");
+    setError(null);
   }
 
   function closeAddRecord() {
@@ -57,37 +113,146 @@ function Matcher({
     setSearch("");
   }
 
+  /*
+   * Add a source record.
+   *
+   * The FIRST record becomes the editable master.
+   * Every subsequent record becomes a read-only
+   * source record.
+   *
+   * We copy the record so that editing the master
+   * can never mutate the raw record in memory.
+   */
   function addRecord(record) {
-    setMatchedRecords(current => {
-      const alreadyAdded = current.some(
-        existing => existing.id === record.id
+    setError(null);
+
+    if (!masterRecord) {
+      setMasterRecord({
+        ...record
+      });
+
+      setAddingRecord(false);
+      setSearch("");
+
+      return;
+    }
+
+    const alreadyAdded =
+      sourceRecords.some(
+        existing =>
+          existing.id === record.id
       );
 
-      if (alreadyAdded) {
-        return current;
-      }
+    if (alreadyAdded) {
+      return;
+    }
 
-      return [
-        ...current,
-        record
-      ];
-    });
+    setSourceRecords(current => [
+      ...current,
+      {
+        ...record
+      }
+    ]);
 
     setSearch("");
   }
 
-  function removeRecord(recordId) {
-    setMatchedRecords(current =>
+  /*
+   * Update a field on the editable master.
+   */
+  function updateMasterRecord(
+    field,
+    value
+  ) {
+    setMasterRecord(current => {
+      if (!current) {
+        return current;
+      }
+
+      return {
+        ...current,
+        [field]: value
+      };
+    });
+  }
+
+  /*
+   * Remove an additional source record.
+   *
+   * The master cannot be removed from here.
+   */
+  function removeSourceRecord(recordId) {
+    setSourceRecords(current =>
       current.filter(
-        record => record.id !== recordId
+        record =>
+          record.id !== recordId
       )
     );
   }
 
-  return (
-    <div className="matcher-page">
+  /*
+   * Save the master record and its source
+   * record references.
+   *
+   * The backend is responsible for:
+   *
+   *   - generating MARINA-xxxxx
+   *   - writing to data/saved
+   *   - never touching data/raw
+   */
+async function handleSave() {
+  if (!masterRecord) {
+    return;
+  }
 
-      {!addingRecord && (
+  setSaving(true);
+  setError(null);
+
+  try {
+    const payload = {
+      masterRecord,
+      sourceRecords
+    };
+
+    const savedRecord =
+      await saveMatch(payload);
+
+    setSavedRecords(current => [
+      ...current,
+      savedRecord
+    ]);
+
+    resetMatcher();
+
+  } catch (err) {
+    console.error(err);
+
+    setError(
+      err.message ||
+      "Failed to save record."
+    );
+  } finally {
+    setSaving(false);
+  }
+}
+
+  function resetMatcher() {
+    setMasterRecord(null);
+    setSourceRecords([]);
+    setAddingRecord(false);
+    setSearch("");
+  }
+
+  /*
+   * No master record yet.
+   *
+   * This is the starting screen where the user
+   * selects the first source record.
+   */
+  if (!masterRecord) {
+    return (
+      <div className="matcher-page">
+
         <div className="matcher-header">
 
           <div>
@@ -96,493 +261,196 @@ function Matcher({
             </h2>
 
             <p>
-              Build and manage marina record
-              matches across data sources.
+              Select the first source record to
+              create a new master record.
+            </p>
+          </div>
+
+        </div>
+
+        {error && (
+          <div className="error">
+            {error}
+          </div>
+        )}
+
+        {!addingRecord ? (
+          <div className="matcher-empty">
+
+            <h2>
+              No master record selected
+            </h2>
+
+            <p>
+              The first record you add becomes
+              the editable master record.
+            </p>
+
+            <button
+              className="primary-button"
+              onClick={openAddRecord}
+            >
+              Add First Record
+            </button>
+
+          </div>
+        ) : (
+          <RecordSearch
+            search={search}
+            setSearch={setSearch}
+            results={searchResults}
+            onAdd={addRecord}
+            onClose={closeAddRecord}
+          />
+        )}
+
+      </div>
+    );
+  }
+
+  /*
+   * A master record now exists.
+   *
+   * Display it at the top and the additional
+   * source records underneath.
+   */
+  return (
+    <div className="matcher-page">
+
+      <div className="matcher-header">
+
+        <div>
+          <h2>
+            Manual Matcher
+          </h2>
+
+          <p>
+            Edit the master record and compare
+            it against the source records.
+          </p>
+        </div>
+
+        <div className="matcher-header-actions">
+
+          <button
+            className="secondary-button"
+            onClick={resetMatcher}
+            disabled={saving}
+          >
+            Start Over
+          </button>
+
+        </div>
+
+      </div>
+
+      {error && (
+        <div className="error">
+          {error}
+        </div>
+      )}
+
+      <MasterRecord
+        record={masterRecord}
+        onChange={updateMasterRecord}
+        onSave={handleSave}
+        saving={saving}
+      />
+
+      <section className="source-records-section">
+
+        <div className="source-records-header">
+
+          <div>
+            <h2>
+              Source Records
+            </h2>
+
+            <p>
+              Additional source records associated
+              with this master record.
             </p>
           </div>
 
           <button
             className="primary-button"
             onClick={openAddRecord}
+            disabled={saving}
           >
-            Add New Record
+            Add Source Record
           </button>
 
         </div>
-      )}
 
-      {addingRecord ? (
-        <AddRecordSearch
-          search={search}
-          setSearch={setSearch}
-          results={searchResults}
-          onAdd={addRecord}
-          onClose={closeAddRecord}
-        />
-      ) : (
-        <MatchedRecords
-          records={matchedRecords}
-          onRemove={removeRecord}
-          onAdd={openAddRecord}
-        />
-      )}
-
-    </div>
-  );
-}
-
-function AddRecordSearch({
-  search,
-  setSearch,
-  results,
-  onAdd,
-  onClose
-}) {
-  return (
-    <div className="add-record-panel">
-
-      <div className="add-record-header">
-
-        <div>
-          <h3>
-            Add Record
-          </h3>
-
-          <p>
-            Search the source records and add
-            one to this match.
-          </p>
-        </div>
-
-        <button
-          className="close-button"
-          onClick={onClose}
-          aria-label="Close add record"
-        >
-          ×
-        </button>
-
-      </div>
-
-      <input
-        className="matcher-search"
-        type="search"
-        placeholder="Search by marina name, address or source..."
-        value={search}
-        onChange={event =>
-          setSearch(event.target.value)
-        }
-        autoFocus
-      />
-
-      <div className="matcher-search-results">
-
-        {!search.trim() ? (
-          <div className="matcher-search-empty">
-            Start typing to search records.
-          </div>
-        ) : results.length === 0 ? (
-          <div className="matcher-search-empty">
-            No matching records found.
-          </div>
-        ) : (
-          results.map(record => (
-            <button
-              key={record.id}
-              className="matcher-search-result"
-              onClick={() => onAdd(record)}
-            >
-
-              <div className="matcher-result-main">
-
-                <strong>
-                  {record.name ||
-                    "Unnamed marina"}
-                </strong>
-
-                <span>
-                  {formatLocation(record)}
-                </span>
-
-              </div>
-
-              <span className="matcher-result-source">
-                {getSourceName(record.source)}
-              </span>
-
-            </button>
-          ))
+        {addingRecord && (
+          <RecordSearch
+            search={search}
+            setSearch={setSearch}
+            results={searchResults}
+            onAdd={addRecord}
+            onClose={closeAddRecord}
+          />
         )}
 
-      </div>
+        {sourceRecords.length === 0 ? (
+          <div className="matcher-empty">
 
-    </div>
-  );
-}
+            <h3>
+              No additional source records
+            </h3>
 
-function MatchedRecords({
-  records,
-  onRemove,
-  onAdd
-}) {
-  if (records.length === 0) {
-    return (
-      <div className="matcher-empty">
+            <p>
+              Add another record to compare
+              information from a different source.
+            </p>
 
-        <h2>
-          No records added
-        </h2>
+          </div>
+        ) : (
+          <div className="source-record-list">
 
-        <p>
-          Add records from the available data
-          sources to begin building a match.
-        </p>
+            {sourceRecords.map(record => (
+              <SourceRecord
+                key={record.id}
+                record={record}
+                onRemove={removeSourceRecord}
+              />
+            ))}
 
-        <button
-          className="primary-button"
-          onClick={onAdd}
-        >
-          Add New Record
-        </button>
+          </div>
+        )}
 
-      </div>
-    );
-  }
+      </section>
 
-  return (
-    <>
-      <div className="matcher-records">
-
-        {records.map(record => (
-          <MatchedRecord
-            key={record.id}
-            record={record}
-            onRemove={onRemove}
-          />
-        ))}
-
-      </div>
-
-      <div className="matcher-add-another">
-        <button
-          className="primary-button"
-          onClick={onAdd}
-        >
-          Add Another Record
-        </button>
-      </div>
-    </>
-  );
-}
-
-function MatchedRecord({
-  record,
-  onRemove
-}) {
-  return (
-    <div className="matcher-record">
-
-      <div className="matcher-record-header">
+      <div className="matcher-save-bar">
 
         <div>
-
-          <span className="source-label">
-            {getSourceName(record.source)}
-          </span>
-
-          <h3>
-            {record.name ||
-              "Unnamed marina"}
-          </h3>
-
-        </div>
-
-        <button
-          className="remove-record-button"
-          onClick={() =>
-            onRemove(record.id)
-          }
-          aria-label={`Remove ${
-            record.name ||
-            "record"
-          }`}
-        >
-          ×
-        </button>
-
-      </div>
-
-      <div className="matcher-record-location">
-        {formatLocation(record)}
-      </div>
-
-      <div className="matcher-detail-grid">
-
-        <MatcherDetailField
-          label="ID"
-          value={record.id}
-        />
-
-        <MatcherDetailField
-          label="Source"
-          value={record.source}
-        />
-
-        <MatcherDetailField
-          label="Source File"
-          value={record.sourceFile}
-        />
-
-        <MatcherDetailField
-          label="Description"
-          value={record.description}
-        />
-
-        <MatcherDetailField
-          label="Location"
-          value={formatCoordinates(
-            record.latitude,
-            record.longitude
-          )}
-        />
-
-        <MatcherDetailField
-          label="Address"
-          value={formatAddress(
-            record.address
-          )}
-        />
-
-        <MatcherDetailField
-          label="Phone"
-          value={record.phone}
-        />
-
-        <MatcherDetailField
-          label="Email"
-          value={record.email}
-        />
-
-        <MatcherDetailField
-          label="Website"
-          value={record.website}
-        />
-
-        <MatcherDetailField
-          label="Berths"
-          value={record.berths}
-        />
-
-        <MatcherDetailField
-          label="Facilities"
-          value={formatJsonValue(
-            record.facilities
-          )}
-        />
-
-        <MatcherDetailField
-          label="Images"
-          value={formatJsonValue(
-            record.images
-          )}
-        />
-
-        <MatcherDetailField
-          label="Source URL"
-          value={record.sourceUrl}
-          link
-        />
-
-      </div>
-
-      <div className="matcher-raw-section">
-
-        <div className="matcher-raw-header">
-
-          <h4>
-            Complete Record
-          </h4>
+          <strong>
+            {sourceRecords.length + 1}
+          </strong>
 
           <span>
-            Normalized record including
-            original source data
+            {" "}source record
+            {sourceRecords.length !== 0
+              ? "s"
+              : ""}
+            {" "}in this match
           </span>
-
         </div>
 
-        <pre>
-          {JSON.stringify(
-            record,
-            null,
-            2
-          )}
-        </pre>
+        <button
+          className="primary-button"
+          onClick={handleSave}
+          disabled={saving}
+        >
+          {saving
+            ? "Saving..."
+            : "Save Record"}
+        </button>
 
       </div>
 
     </div>
   );
-}
-
-function MatcherDetailField({
-  label,
-  value,
-  link = false
-}) {
-  if (
-    value === null ||
-    value === undefined ||
-    value === ""
-  ) {
-    return (
-      <div className="matcher-detail-field">
-
-        <label>
-          {label}
-        </label>
-
-        <div className="muted">
-          Not available
-        </div>
-
-      </div>
-    );
-  }
-
-  return (
-    <div className="matcher-detail-field">
-
-      <label>
-        {label}
-      </label>
-
-      <div>
-
-        {link ? (
-          <a
-            href={value}
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            {value}
-          </a>
-        ) : (
-          String(value)
-        )}
-
-      </div>
-
-    </div>
-  );
-}
-
-function formatJsonValue(value) {
-  if (
-    value === null ||
-    value === undefined
-  ) {
-    return null;
-  }
-
-  if (
-    Array.isArray(value) &&
-    value.length === 0
-  ) {
-    return null;
-  }
-
-  if (
-    typeof value === "object"
-  ) {
-    return JSON.stringify(
-      value,
-      null,
-      2
-    );
-  }
-
-  return String(value);
-}
-
-function formatLocation(record) {
-  const address =
-    formatAddress(record.address);
-
-  if (address) {
-    return address;
-  }
-
-  if (
-    record.latitude !== null &&
-    record.latitude !== undefined &&
-    record.longitude !== null &&
-    record.longitude !== undefined
-  ) {
-    return `${record.latitude}, ${record.longitude}`;
-  }
-
-  return "Location unavailable";
-}
-
-function formatCoordinates(
-  latitude,
-  longitude
-) {
-  if (
-    latitude === null ||
-    latitude === undefined ||
-    longitude === null ||
-    longitude === undefined
-  ) {
-    return null;
-  }
-
-  return `${latitude}, ${longitude}`;
-}
-
-function formatAddress(address) {
-  if (!address) {
-    return null;
-  }
-
-  if (typeof address === "string") {
-    return address;
-  }
-
-  if (Array.isArray(address)) {
-    return (
-      address
-        .filter(Boolean)
-        .join(", ") ||
-      null
-    );
-  }
-
-  if (typeof address === "object") {
-    return (
-      Object.values(address)
-        .filter(
-          value =>
-            value !== null &&
-            value !== undefined &&
-            value !== ""
-        )
-        .join(", ") ||
-      null
-    );
-  }
-
-  return null;
-}
-
-function getSourceName(source) {
-  const names = {
-    tyha: "TYHA",
-    "marinas-com": "Marinas.com",
-    osm: "OpenStreetMap"
-  };
-
-  return names[source] ?? source;
 }
 
 export default Matcher;

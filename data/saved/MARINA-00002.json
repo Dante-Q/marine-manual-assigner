@@ -1,0 +1,66 @@
+{
+  "id": "MARINA-00002",
+  "name": "Hafan Pwlheli",
+  "description": "Situated on the south side of the Llyn Peninsula, Hafan Pwllheli is one of the finest yachting venues in Western Britain with access to some of the best sailing waters in the UK. The area is renowned for its varied pattern of winds, moderate tidal and sea conditions, and the spectacular scenery of the Snowdonian mountains as a backdrop. This rugged coastline has been designated an 'Area of Outstanding National Beauty'.",
+  "latitude": 52.887345,
+  "longitude": -4.405044,
+  "address": [
+    "Hafan Pwlheli",
+    "Glan Don",
+    "Glan Don",
+    "Pwllheli",
+    "LL53 5YT",
+    "Gwynedd, Wales",
+    "United Kingdom"
+  ],
+  "phone": "+44 (0)1758 701219",
+  "email": "hafanpwlheli.co.uk",
+  "website": "hellooooo",
+  "berths": 520,
+  "facilities": [
+    "Boat Care / Valeting",
+    "Boat hoist / Lift out",
+    "Boat Sales / Broker",
+    "Boat storage",
+    "Boat yard",
+    "Café / Coffee Shop",
+    "Car Parking",
+    "Chandlery",
+    "Chemical Toilet / Effluent Disposal",
+    "Electric Car Charging",
+    "Electricity to Berths",
+    "Fuel Dock (Diesel)",
+    "Fuel Dock (Petrol)",
+    "Launderette",
+    "Marine Electronic Services",
+    "Marine engineering trades",
+    "Pump out",
+    "Restaurant / Bar",
+    "Rigging Services",
+    "Sail maker / Repairer",
+    "Slipway",
+    "Toilets & Showers (traditional style)",
+    "Tuition",
+    "Water to Berths",
+    "Wi-Fi"
+  ],
+  "images": [
+    "https://www.tyha.co.uk/GenerateImage.aspx?file=/images/galleries/gallery205/577_Image4.JPG&resize=T&keepRatio=T&maxWidth=600&maxHeight=600",
+    "https://www.tyha.co.uk/GenerateImage.aspx?file=/images/galleries/gallery205/578_Image3.jpg&resize=T&keepRatio=T&maxWidth=600&maxHeight=600",
+    "https://www.tyha.co.uk/GenerateImage.aspx?file=/images/galleries/gallery205/579_Image2.jpg&resize=T&keepRatio=T&maxWidth=600&maxHeight=600",
+    "https://www.tyha.co.uk/GenerateImage.aspx?file=/images/galleries/gallery205/580_hafan1.JPG&resize=T&keepRatio=T&maxWidth=600&maxHeight=600",
+    "https://www.tyha.co.uk/images/galleries/gallery205/577_Image4.JPG"
+  ],
+  "sourceRecords": [
+    {
+      "id": "tyha:201",
+      "source": "tyha"
+    },
+    {
+      "id": "osm:way:480911416",
+      "source": "osm"
+    }
+  ],
+  "createdAt": "2026-08-16T14:59:04.666Z",
+  "updatedAt": "2026-08-16T14:59:04.668Z"
+}

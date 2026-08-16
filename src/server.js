@@ -119,13 +119,89 @@ app.get(
 
 app.post("/api/matches", (req, res) => {
   try {
-    const record =
-      createMatch(req.body);
+    const {
+      masterRecord,
+      sourceRecords = []
+    } = req.body;
+
+    if (!masterRecord) {
+      return res.status(400).json({
+        error:
+          "A master record is required"
+      });
+    }
+
+    const records = [
+      masterRecord,
+      ...sourceRecords
+    ];
+
+    const createdRecord =
+      createMatch(records);
+
+    /*
+     * createMatch() generates the proper
+     * MARINA-xxxxx ID and builds the
+     * sourceRecords array.
+     *
+     * The master record may have been
+     * edited in the UI, so preserve those
+     * edited fields while keeping the
+     * generated master ID.
+     */
+    const record = {
+      ...createdRecord,
+
+      name:
+        masterRecord.name ??
+        createdRecord.name,
+
+      description:
+        masterRecord.description ??
+        createdRecord.description,
+
+      latitude:
+        masterRecord.latitude ??
+        createdRecord.latitude,
+
+      longitude:
+        masterRecord.longitude ??
+        createdRecord.longitude,
+
+      address:
+        masterRecord.address ??
+        createdRecord.address,
+
+      phone:
+        masterRecord.phone ??
+        createdRecord.phone,
+
+      email:
+        masterRecord.email ??
+        createdRecord.email,
+
+      website:
+        masterRecord.website ??
+        createdRecord.website,
+
+      berths:
+        masterRecord.berths ??
+        createdRecord.berths,
+
+      facilities:
+        masterRecord.facilities ??
+        createdRecord.facilities,
+
+      images:
+        masterRecord.images ??
+        createdRecord.images
+    };
 
     const saved =
       saveMatch(record);
 
     res.status(201).json(saved);
+
   } catch (error) {
     console.error(error);
 
