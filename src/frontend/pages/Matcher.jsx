@@ -87,8 +87,7 @@ function Matcher({
   return (
     <div className="matcher-page">
 
-      <div className="matcher-content">
-
+      {!addingRecord && (
         <div className="matcher-header">
 
           <div>
@@ -102,60 +101,31 @@ function Matcher({
             </p>
           </div>
 
-          {!addingRecord && (
-            <button
-              className="primary-button"
-              onClick={openAddRecord}
-            >
-              Add New Record
-            </button>
-          )}
+          <button
+            className="primary-button"
+            onClick={openAddRecord}
+          >
+            Add New Record
+          </button>
 
         </div>
+      )}
 
-        {matchedRecords.length > 0 && (
-          <MatchedRecords
-            records={matchedRecords}
-            onRemove={removeRecord}
-            onAdd={openAddRecord}
-            hideAddButton={addingRecord}
-          />
-        )}
-
-        {addingRecord && (
-          <AddRecordSearch
-            search={search}
-            setSearch={setSearch}
-            results={searchResults}
-            onAdd={addRecord}
-            onClose={closeAddRecord}
-          />
-        )}
-
-        {matchedRecords.length === 0 &&
-          !addingRecord && (
-            <div className="matcher-empty">
-
-              <h2>
-                No records added
-              </h2>
-
-              <p>
-                Add records from the available data
-                sources to begin building a match.
-              </p>
-
-              <button
-                className="primary-button"
-                onClick={openAddRecord}
-              >
-                Add New Record
-              </button>
-
-            </div>
-          )}
-
-      </div>
+      {addingRecord ? (
+        <AddRecordSearch
+          search={search}
+          setSearch={setSearch}
+          results={searchResults}
+          onAdd={addRecord}
+          onClose={closeAddRecord}
+        />
+      ) : (
+        <MatchedRecords
+          records={matchedRecords}
+          onRemove={removeRecord}
+          onAdd={openAddRecord}
+        />
+      )}
 
     </div>
   );
@@ -253,11 +223,30 @@ function AddRecordSearch({
 function MatchedRecords({
   records,
   onRemove,
-  onAdd,
-  hideAddButton = false
+  onAdd
 }) {
   if (records.length === 0) {
-    return null;
+    return (
+      <div className="matcher-empty">
+
+        <h2>
+          No records added
+        </h2>
+
+        <p>
+          Add records from the available data
+          sources to begin building a match.
+        </p>
+
+        <button
+          className="primary-button"
+          onClick={onAdd}
+        >
+          Add New Record
+        </button>
+
+      </div>
+    );
   }
 
   return (
@@ -265,62 +254,254 @@ function MatchedRecords({
       <div className="matcher-records">
 
         {records.map(record => (
-          <div
+          <MatchedRecord
             key={record.id}
-            className="matcher-record"
-          >
-
-            <div className="matcher-record-header">
-
-              <div>
-
-                <span className="source-label">
-                  {getSourceName(record.source)}
-                </span>
-
-                <h3>
-                  {record.name ||
-                    "Unnamed marina"}
-                </h3>
-
-              </div>
-
-              <button
-                className="remove-record-button"
-                onClick={() =>
-                  onRemove(record.id)
-                }
-                aria-label={`Remove ${
-                  record.name ||
-                  "record"
-                }`}
-              >
-                ×
-              </button>
-
-            </div>
-
-            <div className="matcher-record-location">
-              {formatLocation(record)}
-            </div>
-
-          </div>
+            record={record}
+            onRemove={onRemove}
+          />
         ))}
 
       </div>
 
-      {!hideAddButton && (
-        <div className="matcher-add-another">
-          <button
-            className="primary-button"
-            onClick={onAdd}
-          >
-            Add Another Record
-          </button>
-        </div>
-      )}
+      <div className="matcher-add-another">
+        <button
+          className="primary-button"
+          onClick={onAdd}
+        >
+          Add Another Record
+        </button>
+      </div>
     </>
   );
+}
+
+function MatchedRecord({
+  record,
+  onRemove
+}) {
+  return (
+    <div className="matcher-record">
+
+      <div className="matcher-record-header">
+
+        <div>
+
+          <span className="source-label">
+            {getSourceName(record.source)}
+          </span>
+
+          <h3>
+            {record.name ||
+              "Unnamed marina"}
+          </h3>
+
+        </div>
+
+        <button
+          className="remove-record-button"
+          onClick={() =>
+            onRemove(record.id)
+          }
+          aria-label={`Remove ${
+            record.name ||
+            "record"
+          }`}
+        >
+          ×
+        </button>
+
+      </div>
+
+      <div className="matcher-record-location">
+        {formatLocation(record)}
+      </div>
+
+      <div className="matcher-detail-grid">
+
+        <MatcherDetailField
+          label="ID"
+          value={record.id}
+        />
+
+        <MatcherDetailField
+          label="Source"
+          value={record.source}
+        />
+
+        <MatcherDetailField
+          label="Source File"
+          value={record.sourceFile}
+        />
+
+        <MatcherDetailField
+          label="Description"
+          value={record.description}
+        />
+
+        <MatcherDetailField
+          label="Location"
+          value={formatCoordinates(
+            record.latitude,
+            record.longitude
+          )}
+        />
+
+        <MatcherDetailField
+          label="Address"
+          value={formatAddress(
+            record.address
+          )}
+        />
+
+        <MatcherDetailField
+          label="Phone"
+          value={record.phone}
+        />
+
+        <MatcherDetailField
+          label="Email"
+          value={record.email}
+        />
+
+        <MatcherDetailField
+          label="Website"
+          value={record.website}
+        />
+
+        <MatcherDetailField
+          label="Berths"
+          value={record.berths}
+        />
+
+        <MatcherDetailField
+          label="Facilities"
+          value={formatJsonValue(
+            record.facilities
+          )}
+        />
+
+        <MatcherDetailField
+          label="Images"
+          value={formatJsonValue(
+            record.images
+          )}
+        />
+
+        <MatcherDetailField
+          label="Source URL"
+          value={record.sourceUrl}
+          link
+        />
+
+      </div>
+
+      <div className="matcher-raw-section">
+
+        <div className="matcher-raw-header">
+
+          <h4>
+            Complete Record
+          </h4>
+
+          <span>
+            Normalized record including
+            original source data
+          </span>
+
+        </div>
+
+        <pre>
+          {JSON.stringify(
+            record,
+            null,
+            2
+          )}
+        </pre>
+
+      </div>
+
+    </div>
+  );
+}
+
+function MatcherDetailField({
+  label,
+  value,
+  link = false
+}) {
+  if (
+    value === null ||
+    value === undefined ||
+    value === ""
+  ) {
+    return (
+      <div className="matcher-detail-field">
+
+        <label>
+          {label}
+        </label>
+
+        <div className="muted">
+          Not available
+        </div>
+
+      </div>
+    );
+  }
+
+  return (
+    <div className="matcher-detail-field">
+
+      <label>
+        {label}
+      </label>
+
+      <div>
+
+        {link ? (
+          <a
+            href={value}
+            target="_blank"
+            rel="noopener noreferrer"
+          >
+            {value}
+          </a>
+        ) : (
+          String(value)
+        )}
+
+      </div>
+
+    </div>
+  );
+}
+
+function formatJsonValue(value) {
+  if (
+    value === null ||
+    value === undefined
+  ) {
+    return null;
+  }
+
+  if (
+    Array.isArray(value) &&
+    value.length === 0
+  ) {
+    return null;
+  }
+
+  if (
+    typeof value === "object"
+  ) {
+    return JSON.stringify(
+      value,
+      null,
+      2
+    );
+  }
+
+  return String(value);
 }
 
 function formatLocation(record) {
@@ -341,6 +522,22 @@ function formatLocation(record) {
   }
 
   return "Location unavailable";
+}
+
+function formatCoordinates(
+  latitude,
+  longitude
+) {
+  if (
+    latitude === null ||
+    latitude === undefined ||
+    longitude === null ||
+    longitude === undefined
+  ) {
+    return null;
+  }
+
+  return `${latitude}, ${longitude}`;
 }
 
 function formatAddress(address) {

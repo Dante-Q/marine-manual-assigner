@@ -1218,3 +1218,117 @@ a:hover {
     gap: 15px;
   }
 }
+
+/* =========================================================
+   MATCHER RECORD DETAILS
+   ========================================================= */
+
+.matcher-detail-grid {
+  display: grid;
+
+  grid-template-columns: repeat(
+    2,
+    minmax(0, 1fr)
+  );
+
+  gap: 1px;
+
+  margin-top: 20px;
+
+  background: var(--border);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+
+  overflow: hidden;
+}
+
+.matcher-detail-field {
+  min-width: 0;
+  padding: 14px;
+
+  background: var(--panel);
+}
+
+.matcher-detail-field label {
+  display: block;
+
+  margin-bottom: 6px;
+
+  color: var(--text-muted);
+
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: 0.7px;
+  text-transform: uppercase;
+}
+
+.matcher-detail-field > div {
+  color: var(--text-secondary);
+
+  line-height: 1.5;
+
+  overflow-wrap: anywhere;
+}
+
+.matcher-raw-section {
+  margin-top: 20px;
+}
+
+.matcher-raw-header {
+  display: flex;
+  align-items: baseline;
+  gap: 12px;
+
+  margin-bottom: 10px;
+}
+
+.matcher-raw-header h4 {
+  margin: 0;
+
+  font-size: 14px;
+}
+
+.matcher-raw-header span {
+  color: var(--text-muted);
+
+  font-size: 11px;
+}
+
+.matcher-raw-section pre {
+  margin: 0;
+  padding: 16px;
+
+  background: #080e19;
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+
+  color: #a9c9e8;
+
+  font-family:
+    "SFMono-Regular",
+    Consolas,
+    "Liberation Mono",
+    Menlo,
+    monospace;
+
+  font-size: 11px;
+  line-height: 1.55;
+
+  overflow: auto;
+}
+
+/* =========================================================
+   MATCHER RECORD DETAILS - RESPONSIVE
+   ========================================================= */
+
+@media (max-width: 700px) {
+  .matcher-detail-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .matcher-raw-header {
+    align-items: flex-start;
+    flex-direction: column;
+    gap: 4px;
+  }
+}
