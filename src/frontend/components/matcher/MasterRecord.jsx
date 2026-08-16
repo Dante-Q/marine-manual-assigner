@@ -1,9 +1,12 @@
+import { useState } from "react";
+
 import LocationMap from "../LocationMap.jsx";
 
 function MasterRecord({
   record,
   onChange,
-  onSave
+  onSave,
+  saving = false
 }) {
   return (
     <section className="master-record">
@@ -29,8 +32,11 @@ function MasterRecord({
         <button
           className="primary-button"
           onClick={onSave}
+          disabled={saving}
         >
-          Save Record
+          {saving
+            ? "Saving..."
+            : "Save Record"}
         </button>
 
       </div>
@@ -117,6 +123,13 @@ function MasterRecord({
           }
         />
 
+        <FacilitiesField
+          facilities={record.facilities}
+          onChange={facilities =>
+            onChange("facilities", facilities)
+          }
+        />
+
       </div>
 
       <div className="master-record-source">
@@ -199,6 +212,112 @@ function EditableField({
   );
 }
 
+function FacilitiesField({
+  facilities,
+  onChange
+}) {
+  const [inputValue, setInputValue] = useState("");
+  const values = normalizeFacilities(facilities);
+
+  function addFacilities(value) {
+    const additions = normalizeFacilities(value);
+
+    if (additions.length === 0) {
+      return;
+    }
+
+    const existing = new Set(
+      values.map(facility => facility.toLowerCase())
+    );
+
+    const next = [
+      ...values,
+      ...additions.filter(facility => {
+        const key = facility.toLowerCase();
+
+        if (existing.has(key)) {
+          return false;
+        }
+
+        existing.add(key);
+        return true;
+      })
+    ];
+
+    onChange(next);
+    setInputValue("");
+  }
+
+  function removeFacility(facilityToRemove) {
+    onChange(
+      values.filter(
+        facility => facility !== facilityToRemove
+      )
+    );
+  }
+
+  return (
+    <div className="master-record-field facilities-field">
+      <label htmlFor="facilities-input">
+        Facilities
+      </label>
+
+      <div className="facility-input">
+        {values.map(facility => (
+          <span className="facility-badge" key={facility}>
+            {facility}
+
+            <button
+              type="button"
+              onClick={() => removeFacility(facility)}
+              aria-label={`Remove ${facility}`}
+            >
+              ×
+            </button>
+          </span>
+        ))}
+
+        <input
+          id="facilities-input"
+          type="text"
+          value={inputValue}
+          placeholder={
+            values.length === 0
+              ? "Type a facility, then press Enter"
+              : "Add another facility"
+          }
+          onChange={event =>
+            setInputValue(event.target.value)
+          }
+          onKeyDown={event => {
+            if (
+              event.key === "Enter" ||
+              event.key === ","
+            ) {
+              event.preventDefault();
+              addFacilities(inputValue);
+            }
+          }}
+          onBlur={() => addFacilities(inputValue)}
+          onPaste={event => {
+            const pasted =
+              event.clipboardData.getData("text");
+
+            if (/[\n,]/.test(pasted)) {
+              event.preventDefault();
+              addFacilities(pasted);
+            }
+          }}
+        />
+      </div>
+
+      <span className="facility-help">
+        Press Enter or comma to add a facility.
+      </span>
+    </div>
+  );
+}
+
 function formatAddress(address) {
   if (!address) {
     return "";
@@ -226,6 +345,16 @@ function formatAddress(address) {
   }
 
   return String(address);
+}
+
+function normalizeFacilities(facilities) {
+  const rawValues = Array.isArray(facilities)
+    ? facilities
+    : String(facilities ?? "").split(/,|\n/);
+
+  return rawValues
+    .map(facility => String(facility).trim())
+    .filter(Boolean);
 }
 
 function getSourceName(source) {

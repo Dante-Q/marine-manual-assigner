@@ -1,0 +1,48 @@
+{
+  "id": "MARINA-00004",
+  "name": "Aldermaston Wharf",
+  "description": "ABC Leisure Group Limited has been building and operating a hire fleet and providing full marina services to canal users for over 45 years, with a thorough experience of everything to do with narrowboats and boating holidays.",
+  "latitude": 51.40067,
+  "longitude": -1.133749,
+  "address": [
+    "Aldermaston Wharf",
+    "Blisworth Arm",
+    "Padworth",
+    "Reading",
+    "RG7 4JS",
+    "Berkshire, England",
+    "United Kingdom"
+  ],
+  "phone": "+44 (0)1189 714123",
+  "email": "abclg@aldermastonwharf.com",
+  "website": null,
+  "berths": 0,
+  "facilities": [
+    "Boat Care / Valeting",
+    "Boat Charter / Hire",
+    "Boat hoist / Lift out",
+    "Boat Sales / Broker",
+    "Boat yard",
+    "Business Facilities",
+    "Car Parking",
+    "Chandlery",
+    "Chemical Toilet / Effluent Disposal",
+    "Fuel Dock (Diesel)",
+    "Pump out"
+  ],
+  "images": [
+    "https://www.tyha.co.uk/GenerateImage.aspx?file=/images/galleries/gallery235/682_ABC -455.jpg&resize=T&keepRatio=T&maxWidth=600&maxHeight=600",
+    "https://www.tyha.co.uk/GenerateImage.aspx?file=/images/galleries/gallery235/683_DSC_3779.jpg&resize=T&keepRatio=T&maxWidth=600&maxHeight=600",
+    "https://www.tyha.co.uk/GenerateImage.aspx?file=/images/galleries/gallery235/685_VE_Boat_428.jpg&resize=T&keepRatio=T&maxWidth=600&maxHeight=600",
+    "https://www.tyha.co.uk/GenerateImage.aspx?file=/images/galleries/gallery235/686_VE_Boat_488.jpg&resize=T&keepRatio=T&maxWidth=600&maxHeight=600",
+    "https://www.tyha.co.uk/images/galleries/gallery235/682_ABC -455.jpg"
+  ],
+  "sourceRecords": [
+    {
+      "id": "tyha:231",
+      "source": "tyha"
+    }
+  ],
+  "createdAt": "2026-08-16T16:07:48.513Z",
+  "updatedAt": "2026-08-16T16:07:48.513Z"
+}

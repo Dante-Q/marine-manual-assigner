@@ -1,0 +1,45 @@
+{
+  "id": "MARINA-00005",
+  "name": "Alvechurch Marina",
+  "description": "ABC Leisure Group Limited has been building and operating a hire fleet and providing full marina services to canal users for over 45 years, with a thorough experience of everything to do with narrowboats and boating holidays.",
+  "latitude": 52.347393,
+  "longitude": -1.969585,
+  "address": [
+    "Alvechurch Marina",
+    "Scarfield Wharf",
+    "Alvechurch",
+    "B48 7SQ",
+    "Worcestershire, England",
+    "United Kingdom"
+  ],
+  "phone": "+44 (0)121 445 1133",
+  "email": "abclg@alvechurchmairna.com",
+  "website": null,
+  "berths": 45,
+  "facilities": [
+    "Boat Care / Valeting",
+    "Boat Charter / Hire",
+    "Boat hoist / Lift out",
+    "Boat Sales / Broker",
+    "Boat yard",
+    "Business Facilities",
+    "Café / Coffee Shop",
+    "Car Parking",
+    "Dante was here"
+  ],
+  "images": [
+    "https://www.tyha.co.uk/GenerateImage.aspx?file=/images/galleries/gallery236/687_ABC -455.jpg&resize=T&keepRatio=T&maxWidth=600&maxHeight=600",
+    "https://www.tyha.co.uk/GenerateImage.aspx?file=/images/galleries/gallery236/688_Alvechurch marina 1.jpg&resize=T&keepRatio=T&maxWidth=600&maxHeight=600",
+    "https://www.tyha.co.uk/GenerateImage.aspx?file=/images/galleries/gallery236/689_DSC_0135.jpg&resize=T&keepRatio=T&maxWidth=600&maxHeight=600",
+    "https://www.tyha.co.uk/GenerateImage.aspx?file=/images/galleries/gallery236/690_DSC_3779.jpg&resize=T&keepRatio=T&maxWidth=600&maxHeight=600",
+    "https://www.tyha.co.uk/images/galleries/gallery236/687_ABC -455.jpg"
+  ],
+  "sourceRecords": [
+    {
+      "id": "tyha:232",
+      "source": "tyha"
+    }
+  ],
+  "createdAt": "2026-08-16T16:10:20.384Z",
+  "updatedAt": "2026-08-16T16:10:20.384Z"
+}

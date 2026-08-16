@@ -164,6 +164,7 @@ function App() {
           <RecordMap
             records={records}
             savedRecords={savedRecords}
+            setSavedRecords={setSavedRecords}
           />
         )}
 

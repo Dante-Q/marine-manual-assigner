@@ -760,9 +760,11 @@ a:hover {
 
   width: 100%;
   height: calc(100% - var(--topbar-height));
+  min-height: 0;
   padding: 28px;
 
   background: var(--bg);
+  overflow-y: auto;
 }
 
 .record-map-header {
@@ -836,8 +838,9 @@ a:hover {
 
 .record-map-frame {
   position: relative;
-  min-height: 0;
-  flex: 1;
+  height: min(62vh, 600px);
+  min-height: 420px;
+  flex: 0 0 auto;
 
   background: var(--panel);
   border: 1px solid var(--border);
@@ -859,6 +862,56 @@ a:hover {
   min-height: 420px;
   place-items: center;
   color: var(--danger);
+}
+
+.record-map-help {
+  margin: 12px 0 0;
+  color: var(--text-muted);
+  font-size: 12px;
+}
+
+.record-map-notice {
+  margin-top: 16px;
+  padding: 11px 14px;
+  border: 1px solid;
+  border-radius: var(--radius);
+  font-size: 13px;
+}
+
+.record-map-notice.success {
+  background: rgba(46, 204, 113, 0.1);
+  border-color: rgba(46, 204, 113, 0.3);
+  color: #6ee79a;
+}
+
+.record-map-notice.error {
+  background: rgba(239, 83, 80, 0.1);
+  border-color: rgba(239, 83, 80, 0.32);
+  color: var(--danger);
+}
+
+.record-map-editor {
+  width: min(1120px, 100%);
+  margin: 22px auto 0;
+}
+
+.record-map-editor-header {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 20px;
+  margin-bottom: 14px;
+}
+
+.record-map-editor-header h2 {
+  margin: 0 0 5px;
+  font-size: 18px;
+}
+
+.record-map-editor-header p {
+  margin: 0;
+  color: var(--text-muted);
+  line-height: 1.5;
 }
 
 .record-map-popup strong,
@@ -1425,6 +1478,10 @@ a:hover {
     min-height: 360px;
   }
 
+  .record-map-editor-header {
+    flex-direction: column;
+  }
+
   .matcher-header {
     align-items: flex-start;
     flex-direction: column;
@@ -1764,6 +1821,81 @@ a:hover {
 .master-record-field textarea {
   min-height: 104px;
   resize: vertical;
+}
+
+.facilities-field {
+  grid-column: 1 / -1;
+}
+
+.facility-input {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 7px;
+  min-height: 42px;
+  padding: 6px;
+
+  background: var(--bg);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-small);
+
+  transition: border-color 0.15s ease, box-shadow 0.15s ease;
+}
+
+.facility-input:focus-within {
+  border-color: var(--blue);
+  box-shadow: 0 0 0 2px rgba(22, 131, 255, 0.14);
+}
+
+.facility-input input {
+  min-width: 170px;
+  flex: 1;
+  padding: 4px;
+
+  background: transparent;
+  border: 0;
+  color: var(--text);
+  outline: none;
+}
+
+.facility-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  padding: 4px 5px 4px 8px;
+
+  background: rgba(22, 131, 255, 0.16);
+  border: 1px solid rgba(22, 131, 255, 0.32);
+  border-radius: 5px;
+  color: #8bc6ff;
+  font-size: 12px;
+  line-height: 1.25;
+}
+
+.facility-badge button {
+  display: grid;
+  width: 16px;
+  height: 16px;
+  padding: 0;
+  place-items: center;
+
+  background: transparent;
+  border: 0;
+  border-radius: 3px;
+  color: inherit;
+  cursor: pointer;
+}
+
+.facility-badge button:hover {
+  background: rgba(255, 255, 255, 0.13);
+  color: white;
+}
+
+.facility-help {
+  display: block;
+  margin-top: 6px;
+  color: var(--text-muted);
+  font-size: 11px;
 }
 
 .master-record-field input,

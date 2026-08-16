@@ -56,7 +56,7 @@ function loadLeaflet() {
   return leafletPromise;
 }
 
-function LeafletMap({ records }) {
+function LeafletMap({ records, onSelectRecord }) {
   const containerRef = useRef(null);
   const mapRef = useRef(null);
   const markerLayerRef = useRef(null);
@@ -123,6 +123,7 @@ function LeafletMap({ records }) {
 
       const marker = L.marker([latitude, longitude]);
       marker.bindPopup(createPopup(record));
+      marker.on("click", () => onSelectRecord?.(record));
       marker.addTo(markers);
       bounds.push([latitude, longitude]);
     }
@@ -135,7 +136,7 @@ function LeafletMap({ records }) {
         maxZoom: 13
       });
     }
-  }, [records, ready]);
+  }, [records, ready, onSelectRecord]);
 
   if (error) {
     return <div className="record-map-error">{error}</div>;
