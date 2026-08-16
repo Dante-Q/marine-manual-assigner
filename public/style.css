@@ -4,6 +4,7 @@
 
 body {
   margin: 0;
+
   font-family:
     Inter,
     -apple-system,
@@ -20,27 +21,83 @@ input {
   font: inherit;
 }
 
+/* ------------------------------------------------------------
+   TOP BAR
+------------------------------------------------------------ */
+
 .topbar {
   height: 72px;
+
   padding: 0 24px;
 
   display: flex;
   align-items: center;
+  justify-content: space-between;
 
   background: #111827;
-  border-bottom: 1px solid #1f2937;
+
+  border-bottom:
+    1px solid #1f2937;
 }
 
-.topbar h1 {
+.brand h1 {
   margin: 0;
+
   font-size: 20px;
 }
 
-.topbar p {
+.brand p {
   margin: 4px 0 0;
+
   color: #94a3b8;
+
   font-size: 13px;
 }
+
+/* ------------------------------------------------------------
+   NAVBAR
+------------------------------------------------------------ */
+
+.navbar {
+  height: 100%;
+
+  display: flex;
+  align-items: center;
+
+  gap: 4px;
+}
+
+.nav-button {
+  height: 100%;
+
+  padding: 0 18px;
+
+  border: 0;
+  border-bottom: 2px solid transparent;
+
+  background: transparent;
+
+  color: #64748b;
+
+  cursor: pointer;
+
+  font-size: 13px;
+  font-weight: 600;
+}
+
+.nav-button:hover {
+  color: #cbd5e1;
+}
+
+.nav-button.active {
+  border-bottom-color: #3b82f6;
+
+  color: #f8fafc;
+}
+
+/* ------------------------------------------------------------
+   APP
+------------------------------------------------------------ */
 
 .app {
   height: calc(100vh - 72px);
@@ -48,21 +105,30 @@ input {
   display: flex;
 }
 
+/* ------------------------------------------------------------
+   INSPECTOR SIDEBAR
+------------------------------------------------------------ */
+
 .sidebar {
   width: 230px;
+
   flex-shrink: 0;
 
   padding: 20px 12px;
 
   background: #0f172a;
-  border-right: 1px solid #1f2937;
+
+  border-right:
+    1px solid #1f2937;
 }
 
 .sidebar h2 {
   margin: 0 12px 12px;
 
   font-size: 11px;
+
   text-transform: uppercase;
+
   letter-spacing: 0.08em;
 
   color: #64748b;
@@ -72,18 +138,22 @@ input {
   width: 100%;
 
   display: flex;
+
   justify-content: space-between;
   align-items: center;
 
   padding: 11px 12px;
 
   border: 0;
+
   border-radius: 7px;
 
   background: transparent;
+
   color: #cbd5e1;
 
   cursor: pointer;
+
   text-align: left;
 }
 
@@ -93,6 +163,7 @@ input {
 
 .source-button.active {
   background: #1e3a5f;
+
   color: #fff;
 }
 
@@ -106,20 +177,29 @@ input {
   background: #1e293b;
 
   color: #94a3b8;
+
   font-size: 11px;
+
   text-align: center;
 }
 
 .source-button.active .count {
   background: #2563eb;
+
   color: white;
 }
 
+/* ------------------------------------------------------------
+   RECORDS
+------------------------------------------------------------ */
+
 .records-panel {
   flex: 1;
+
   min-width: 0;
 
   display: flex;
+
   flex-direction: column;
 }
 
@@ -129,19 +209,23 @@ input {
   padding: 12px 20px;
 
   display: flex;
+
   align-items: center;
   justify-content: space-between;
 
-  border-bottom: 1px solid #1f2937;
+  border-bottom:
+    1px solid #1f2937;
 }
 
 .records-header h2 {
   margin: 0;
+
   font-size: 17px;
 }
 
 .records-header span {
   color: #64748b;
+
   font-size: 12px;
 }
 
@@ -150,10 +234,13 @@ input {
 
   padding: 9px 12px;
 
-  border: 1px solid #334155;
+  border:
+    1px solid #334155;
+
   border-radius: 6px;
 
   background: #111827;
+
   color: #e5e7eb;
 
   outline: none;
@@ -165,6 +252,7 @@ input {
 
 .content {
   flex: 1;
+
   min-height: 0;
 
   display: flex;
@@ -172,26 +260,33 @@ input {
 
 .record-list {
   width: 340px;
+
   flex-shrink: 0;
 
   overflow-y: auto;
 
-  border-right: 1px solid #1f2937;
+  border-right:
+    1px solid #1f2937;
 }
 
 .record-item {
   width: 100%;
 
   display: flex;
+
   flex-direction: column;
+
   gap: 5px;
 
   padding: 13px 16px;
 
   border: 0;
-  border-bottom: 1px solid #1e293b;
+
+  border-bottom:
+    1px solid #1e293b;
 
   background: transparent;
+
   color: #e5e7eb;
 
   cursor: pointer;
@@ -205,7 +300,10 @@ input {
 
 .record-item.selected {
   background: #172554;
-  border-left: 3px solid #3b82f6;
+
+  border-left:
+    3px solid #3b82f6;
+
   padding-left: 13px;
 }
 
@@ -219,12 +317,19 @@ input {
   color: #64748b;
 
   font-size: 12px;
+
   text-overflow: ellipsis;
+
   white-space: nowrap;
 }
 
+/* ------------------------------------------------------------
+   RECORD DETAIL
+------------------------------------------------------------ */
+
 .record-detail {
   flex: 1;
+
   min-width: 0;
 
   overflow-y: auto;
@@ -250,7 +355,9 @@ input {
   color: #60a5fa;
 
   font-size: 11px;
+
   font-weight: 600;
+
   text-transform: uppercase;
 }
 
@@ -264,7 +371,10 @@ input {
   display: grid;
 
   grid-template-columns:
-    repeat(2, minmax(0, 1fr));
+    repeat(
+      2,
+      minmax(0, 1fr)
+    );
 
   gap: 16px;
 }
@@ -272,7 +382,9 @@ input {
 .detail-field {
   padding: 14px;
 
-  border: 1px solid #1e293b;
+  border:
+    1px solid #1e293b;
+
   border-radius: 7px;
 
   background: #111827;
@@ -286,12 +398,15 @@ input {
   color: #64748b;
 
   font-size: 11px;
+
   font-weight: 600;
+
   text-transform: uppercase;
 }
 
 .detail-field a {
   color: #60a5fa;
+
   word-break: break-all;
 }
 
@@ -299,12 +414,34 @@ input {
   color: #475569;
 }
 
+/* ------------------------------------------------------------
+   RAW JSON
+------------------------------------------------------------ */
+
 .raw-section {
   margin-top: 28px;
 }
 
 .raw-section h3 {
+  margin: 0;
+
   font-size: 14px;
+}
+
+.raw-section-header {
+  display: flex;
+
+  align-items: baseline;
+
+  gap: 10px;
+
+  margin-bottom: 10px;
+}
+
+.raw-description {
+  color: #475569;
+
+  font-size: 11px;
 }
 
 .raw-section pre {
@@ -312,9 +449,13 @@ input {
 
   overflow: auto;
 
+  margin: 0;
+
   padding: 16px;
 
-  border: 1px solid #1e293b;
+  border:
+    1px solid #1e293b;
+
   border-radius: 7px;
 
   background: #020617;
@@ -322,8 +463,13 @@ input {
   color: #94a3b8;
 
   font-size: 12px;
+
   line-height: 1.5;
 }
+
+/* ------------------------------------------------------------
+   EMPTY / LOADING / ERROR
+------------------------------------------------------------ */
 
 .empty-state,
 .empty-list,
@@ -336,15 +482,81 @@ input {
 
 .empty-state {
   margin-top: 80px;
+
   text-align: center;
 }
 
 .empty-state h2 {
   color: #cbd5e1;
+
   font-size: 18px;
 }
 
+/* ------------------------------------------------------------
+   MATCHER
+------------------------------------------------------------ */
+
+.page {
+  flex: 1;
+
+  min-width: 0;
+
+  overflow-y: auto;
+
+  padding: 32px;
+}
+
+.page-header {
+  margin-bottom: 28px;
+}
+
+.page-header h2 {
+  margin: 0;
+
+  font-size: 26px;
+}
+
+.page-header p {
+  margin: 8px 0 0;
+
+  color: #64748b;
+
+  font-size: 13px;
+}
+
+.matcher-placeholder {
+  padding: 40px;
+
+  border:
+    1px solid #1e293b;
+
+  border-radius: 8px;
+
+  background: #111827;
+}
+
+.matcher-placeholder h3 {
+  margin-top: 0;
+
+  color: #cbd5e1;
+
+  font-size: 16px;
+}
+
+.matcher-placeholder p {
+  margin-bottom: 0;
+
+  color: #64748b;
+
+  font-size: 13px;
+}
+
+/* ------------------------------------------------------------
+   RESPONSIVE
+------------------------------------------------------------ */
+
 @media (max-width: 900px) {
+
   .sidebar {
     width: 190px;
   }
@@ -356,4 +568,25 @@ input {
   .detail-grid {
     grid-template-columns: 1fr;
   }
+
+}
+
+@media (max-width: 700px) {
+
+  .topbar {
+    padding: 0 14px;
+  }
+
+  .brand p {
+    display: none;
+  }
+
+  .nav-button {
+    padding: 0 10px;
+  }
+
+  .page {
+    padding: 20px;
+  }
+
 }
