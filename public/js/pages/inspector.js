@@ -12,6 +12,23 @@ export function renderInspector() {
 
         <button
           class="source-button ${
+            state.selectedSource === "all"
+              ? "active"
+              : ""
+          }"
+          data-source="all"
+        >
+          <span>All Records</span>
+          <span
+            class="count"
+            id="count-all"
+          >
+            0
+          </span>
+        </button>
+
+        <button
+          class="source-button ${
             state.selectedSource === "tyha"
               ? "active"
               : ""
@@ -72,7 +89,7 @@ export function renderInspector() {
         <div>
 
           <h2 id="source-title">
-            TYHA Records
+            All Records
           </h2>
 
           <span id="record-count">
@@ -148,6 +165,7 @@ export function initInspector() {
   function updateCounts() {
 
     const counts = {
+      all: state.records.length,
       tyha: 0,
       "marinas-com": 0,
       osm: 0
@@ -162,6 +180,10 @@ export function initInspector() {
       }
 
     }
+
+    document.getElementById(
+      "count-all"
+    ).textContent = counts.all;
 
     document.getElementById(
       "count-tyha"
@@ -187,8 +209,9 @@ export function initInspector() {
     return state.records.filter(record => {
 
       if (
+        state.selectedSource !== "all" &&
         record.source !==
-        state.selectedSource
+          state.selectedSource
       ) {
         return false;
       }
@@ -238,34 +261,42 @@ export function initInspector() {
     }
 
     recordList.innerHTML =
-      filtered
-        .map(record => `
-          <button
-            class="record-item ${
-              state.selectedRecord?.id ===
-              record.id
-                ? "selected"
-                : ""
-            }"
-            data-id="${escapeHtml(record.id)}"
-          >
+  filtered
+    .map(record => `
+      <button
+        class="record-item ${
+          state.selectedRecord?.id ===
+          record.id
+            ? "selected"
+            : ""
+        }"
+        data-id="${escapeHtml(record.id)}"
+      >
 
-            <strong>
-              ${escapeHtml(
-                record.name ||
-                "Unnamed marina"
-              )}
-            </strong>
+        <strong>
+          ${escapeHtml(
+            record.name ||
+            "Unnamed marina"
+          )}
+        </strong>
 
-            <span>
-              ${escapeHtml(
-                formatLocation(record)
-              )}
-            </span>
+        <span class="record-source">
+          ${escapeHtml(
+            getSourceName(
+              record.source
+            )
+          )}
+        </span>
 
-          </button>
-        `)
-        .join("");
+        <span>
+          ${escapeHtml(
+            formatLocation(record)
+          )}
+        </span>
+
+      </button>
+    `)
+    .join("");
 
     document
       .querySelectorAll(".record-item")
@@ -604,6 +635,7 @@ export function initInspector() {
   function getSourceName(source) {
 
     const names = {
+      all: "All Records",
       tyha: "TYHA",
       "marinas-com":
         "Marinas.com",
