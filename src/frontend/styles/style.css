@@ -1017,17 +1017,46 @@ a:hover {
   line-height: 1.5;
 }
 
-.record-map-source-records {
-  margin-top: 22px;
+.record-map-match-tabs {
+  display: flex;
+  gap: 6px;
+  margin-bottom: 14px;
+  padding-bottom: 8px;
+  border-bottom: 1px solid var(--border);
+  overflow-x: auto;
 }
 
-.record-map-source-empty {
-  padding: 20px;
+.record-map-match-tabs button {
+  padding: 8px 11px;
+  background: transparent;
+  border: 1px solid transparent;
+  border-radius: var(--radius-small);
+  color: var(--text-muted);
+  font-size: 12px;
+  font-weight: 600;
+  white-space: nowrap;
+  cursor: pointer;
+}
+
+.record-map-match-tabs button:hover {
+  background: var(--panel-hover);
+  color: var(--text);
+}
+
+.record-map-match-tabs button.active {
+  background: var(--blue-soft);
+  border-color: rgba(22, 131, 255, 0.35);
+  color: #75bcff;
+}
+
+.record-map-source-hint {
+  margin: 14px 0 0;
+  padding: 11px 13px;
   background: var(--panel);
   border: 1px dashed var(--border-light);
   border-radius: var(--radius);
   color: var(--text-muted);
-  font-size: 13px;
+  font-size: 12px;
 }
 
 .record-map-popup strong,
@@ -1087,6 +1116,39 @@ a:hover {
 .record-map-add-source-button:hover {
   background: #eff5fb;
   border-color: #9db4cf;
+}
+
+.record-map-edit-raw-button,
+.record-map-delete-raw-button {
+  margin-top: 7px;
+  margin-left: 6px;
+  padding: 5px 8px;
+  background: #fff1f1;
+  border: 1px solid #ef8585;
+  border-radius: 4px;
+  color: #c53030;
+  font-size: 10px;
+  cursor: pointer;
+}
+
+.record-map-delete-raw-button {
+  background: #d94343;
+  border-color: #d94343;
+  color: white;
+}
+
+.record-map-edit-raw-button:hover {
+  background: #ffe1e1;
+  border-color: #df5a5a;
+}
+
+.record-map-delete-raw-button:hover {
+  background: #c53030;
+  border-color: #c53030;
+}
+
+.raw-editor .master-record {
+  border-color: rgba(239, 83, 80, 0.48);
 }
 
 .matcher-header {
@@ -1933,6 +1995,18 @@ a:hover {
   font-weight: 700;
   letter-spacing: 0.55px;
   text-transform: uppercase;
+}
+
+.master-record-label.raw-record-label {
+  background: rgba(239, 83, 80, 0.14);
+  border-color: rgba(239, 83, 80, 0.35);
+  color: #ff8b88;
+}
+
+.master-record-badges {
+  display: flex;
+  align-items: center;
+  gap: 8px;
 }
 
 .master-record-header h2,

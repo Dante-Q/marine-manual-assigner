@@ -313,6 +313,172 @@ export function loadRecords() {
 
   return records;
 }
+
+export function updateRawRecord(id, updates) {
+  const record = findRawRecord(id);
+
+  if (record.source === "osm") {
+    return updateOsmRecord(record, updates);
+  }
+
+  const filePath = getRawFilePath(record);
+  const data = readJsonFile(filePath);
+
+  if (record.source === "tyha") {
+    updateTyhaRecord(data, updates);
+  } else if (record.source === "marinas-com") {
+    updateMarinasComRecord(data, updates);
+  } else {
+    throw new Error(`Unsupported raw source: ${record.source}`);
+  }
+
+  writeJsonFile(filePath, data);
+  return findRawRecord(id);
+}
+
+export function deleteRawRecord(id) {
+  const record = findRawRecord(id);
+
+  if (record.source === "osm") {
+    const filePath = getRawFilePath(record);
+    const data = readJsonFile(filePath);
+    const elements = data?.data?.elements ?? [];
+    const index = elements.findIndex(element =>
+      `osm:${element.type}:${element.id}` === id
+    );
+
+    if (index === -1) {
+      throw new Error("Raw OSM record not found");
+    }
+
+    elements.splice(index, 1);
+    writeJsonFile(filePath, data);
+  } else {
+    fs.unlinkSync(getRawFilePath(record));
+  }
+
+  return true;
+}
+
+function findRawRecord(id) {
+  const record = loadRecords().find(item => item.id === id);
+
+  if (!record) {
+    throw new Error("Raw record not found");
+  }
+
+  return record;
+}
+
+function getRawFilePath(record) {
+  if (record.source === "tyha") {
+    return path.join(DATA_DIR, "tyha", "marinas", record.sourceFile);
+  }
+
+  if (record.source === "marinas-com") {
+    return path.join(DATA_DIR, "marinas-com", record.sourceFile);
+  }
+
+  if (record.source === "osm") {
+    return path.join(
+      DATA_DIR,
+      "sailingworldmap",
+      "uk-marinas2.json"
+    );
+  }
+
+  throw new Error(`Unsupported raw source: ${record.source}`);
+}
+
+function readJsonFile(filePath) {
+  return JSON.parse(fs.readFileSync(filePath, "utf8"));
+}
+
+function writeJsonFile(filePath, data) {
+  fs.writeFileSync(
+    filePath,
+    JSON.stringify(data, null, 2) + "\n",
+    "utf8"
+  );
+}
+
+function updateTyhaRecord(data, updates) {
+  data.identity ??= {};
+  data.overview ??= {};
+  data.location ??= {};
+  data.contact ??= {};
+
+  data.identity.name = updates.name ?? null;
+  data.overview.description = updates.description ?? null;
+  data.overview.berths = updates.berths ?? null;
+  data.location.latitude = toNumberOrNull(updates.latitude);
+  data.location.longitude = toNumberOrNull(updates.longitude);
+  data.address = updates.address ?? [];
+  data.contact.phone = updates.phone ?? null;
+  data.contact.email = updates.email ?? null;
+  data.contact.website = updates.website ?? null;
+  data.facilities = Array.isArray(updates.facilities)
+    ? updates.facilities
+    : [];
+}
+
+function updateMarinasComRecord(data, updates) {
+  if (!data.marina) {
+    throw new Error("Invalid Marinas.com raw record");
+  }
+
+  const marina = data.marina;
+  marina.coordinates ??= {};
+  marina.contact ??= {};
+
+  marina.name = updates.name ?? null;
+  marina.description = updates.description ?? null;
+  marina.berthCapacity = updates.berths ?? null;
+  marina.coordinates.latitude = toNumberOrNull(updates.latitude);
+  marina.coordinates.longitude = toNumberOrNull(updates.longitude);
+  marina.address = updates.address ?? {};
+  marina.contact.phone = updates.phone ?? null;
+  marina.contact.email = updates.email ?? null;
+  marina.contact.website = updates.website ?? null;
+  marina.facilities = Array.isArray(updates.facilities)
+    ? updates.facilities
+    : [];
+}
+
+function updateOsmRecord(record, updates) {
+  const filePath = getRawFilePath(record);
+  const data = readJsonFile(filePath);
+  const element = data?.data?.elements?.find(item =>
+    `osm:${item.type}:${item.id}` === record.id
+  );
+
+  if (!element) {
+    throw new Error("Raw OSM record not found");
+  }
+
+  element.tags ??= {};
+  element.tags.name = updates.name ?? null;
+  element.tags.phone = updates.phone ?? null;
+  element.tags.email = updates.email ?? null;
+  element.tags.website = updates.website ?? null;
+  element.tags.facilities = Array.isArray(updates.facilities)
+    ? updates.facilities.join(";")
+    : "";
+  element.lat = toNumberOrNull(updates.latitude);
+  element.lon = toNumberOrNull(updates.longitude);
+
+  writeJsonFile(filePath, data);
+  return findRawRecord(record.id);
+}
+
+function toNumberOrNull(value) {
+  if (value === null || value === undefined || value === "") {
+    return null;
+  }
+
+  const number = Number(value);
+  return Number.isFinite(number) ? number : null;
+}
 export function loadSavedRecords() {
   const savedDir = path.join(
     __dirname,

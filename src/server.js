@@ -2,7 +2,11 @@ import express from "express";
 import path from "path";
 import { fileURLToPath } from "url";
 
-import { loadRecords } from "./records.js";
+import {
+  deleteRawRecord,
+  loadRecords,
+  updateRawRecord
+} from "./records.js";
 
 import {
   loadSavedRecords,
@@ -55,6 +59,26 @@ app.get("/api/records", (req, res) => {
     res.status(500).json({
       error: "Failed to load records"
     });
+  }
+});
+
+app.put("/api/raw-records/:id", (req, res) => {
+  try {
+    const record = updateRawRecord(req.params.id, req.body);
+    res.json(record);
+  } catch (error) {
+    console.error(error);
+    res.status(400).json({ error: error.message });
+  }
+});
+
+app.delete("/api/raw-records/:id", (req, res) => {
+  try {
+    deleteRawRecord(req.params.id);
+    res.status(204).end();
+  } catch (error) {
+    console.error(error);
+    res.status(400).json({ error: error.message });
   }
 });
 

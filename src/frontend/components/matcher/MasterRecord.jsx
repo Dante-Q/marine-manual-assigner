@@ -8,7 +8,10 @@ function MasterRecord({
   onSave,
   saving = false,
   sourceName,
-  saveLabel = "Save Record"
+  saveLabel = "Save Record",
+  recordLabel = "Master Record",
+  recordLabelClassName = "",
+  sourceBadge
 }) {
   return (
     <section className="master-record">
@@ -16,9 +19,21 @@ function MasterRecord({
       <div className="master-record-header">
 
         <div>
-          <span className="master-record-label">
-            Master Record
-          </span>
+          <div className="master-record-badges">
+            <span
+              className={`master-record-label ${
+                recordLabelClassName
+              }`}
+            >
+              {recordLabel}
+            </span>
+
+            {sourceBadge && (
+              <span className="source-label">
+                {sourceBadge}
+              </span>
+            )}
+          </div>
 
           <h2>
             {record.name ||

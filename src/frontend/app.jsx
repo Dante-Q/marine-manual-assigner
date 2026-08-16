@@ -166,6 +166,7 @@ function App() {
         {page === "record-map" && (
           <RecordMap
             records={records}
+            setRecords={setRecords}
             savedRecords={savedRecords}
             setSavedRecords={setSavedRecords}
             mapView={recordMapView}

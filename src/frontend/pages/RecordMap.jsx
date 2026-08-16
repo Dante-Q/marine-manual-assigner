@@ -10,12 +10,15 @@ import LeafletMap from "../components/map/LeafletMap.jsx";
 import MasterRecord from "../components/matcher/MasterRecord.jsx";
 import SourceRecord from "../components/matcher/SourceRecord.jsx";
 import {
+  deleteRawRecord,
   saveMatch,
+  updateRawRecord,
   updateMatch
 } from "../api/api.js";
 
 function RecordMap({
   records,
+  setRecords,
   savedRecords,
   setSavedRecords,
   mapView,
@@ -24,6 +27,8 @@ function RecordMap({
   const [selectedSource, setSelectedSource] = useState("all");
   const [selectedRecord, setSelectedRecord] = useState(null);
   const [sourceRecords, setSourceRecords] = useState([]);
+  const [activeMatchTab, setActiveMatchTab] = useState("master");
+  const [rawDraft, setRawDraft] = useState(null);
   const [hideMatchedPins, setHideMatchedPins] = useState(false);
   const [showSavedPins, setShowSavedPins] = useState(true);
   const [saving, setSaving] = useState(false);
@@ -92,9 +97,26 @@ function RecordMap({
     matchedRecordIds
   ]);
 
+  const mapRecords = useMemo(() => {
+    if (!rawDraft || !hasCoordinates(rawDraft)) {
+      return visibleRecords;
+    }
+
+    return visibleRecords.map(record =>
+      record.id === rawDraft.id
+        ? {
+            ...record,
+            latitude: rawDraft.latitude,
+            longitude: rawDraft.longitude
+          }
+        : record
+    );
+  }, [visibleRecords, rawDraft]);
+
   const handleSelectRecord = useCallback(record => {
     setSelectedRecord({ ...record });
     setSourceRecords([]);
+    setActiveMatchTab("master");
     setSaveError(null);
     setSaveSuccess(null);
   }, []);
@@ -107,21 +129,29 @@ function RecordMap({
 
       return [...current, { ...record }];
     });
+    setActiveMatchTab(`source:${record.id}`);
+  }, []);
+
+  const handleEditRawRecord = useCallback(record => {
+    setRawDraft({ ...record });
+    setSaveError(null);
+    setSaveSuccess(null);
   }, []);
 
   useEffect(() => {
-    if (selectedRecord) {
+    if (selectedRecord || rawDraft) {
       pageRef.current?.scrollTo({
         top: editorRef.current?.offsetTop ?? 0,
         behavior: "smooth",
       });
     }
-  }, [selectedRecord]);
+  }, [selectedRecord, rawDraft]);
 
   function handleSourceChange(source) {
     setSelectedSource(source);
     setSelectedRecord(null);
     setSourceRecords([]);
+    setActiveMatchTab("master");
     setSaveError(null);
     setSaveSuccess(null);
   }
@@ -133,10 +163,57 @@ function RecordMap({
     }));
   }
 
+  function updateRawDraft(field, value) {
+    setRawDraft(current => ({
+      ...current,
+      [field]: value
+    }));
+  }
+
+  async function saveRawDraft() {
+    if (!rawDraft) return;
+
+    if (!window.confirm(
+      `Save changes to raw record “${rawDraft.name || rawDraft.id}”?`
+    )) return;
+
+    setSaving(true);
+    setSaveError(null);
+
+    try {
+      const updated = await updateRawRecord(rawDraft.id, rawDraft);
+      setRecords(current => current.map(record =>
+        record.id === updated.id ? updated : record
+      ));
+      setRawDraft(null);
+      setSaveSuccess("Raw record updated.");
+    } catch (error) {
+      setSaveError(error.message || "Failed to update raw record.");
+    } finally {
+      setSaving(false);
+    }
+  }
+
+  async function handleDeleteRawRecord(record) {
+    if (!window.confirm(
+      `Delete raw record “${record.name || record.id}”? This cannot be undone.`
+    )) return;
+
+    try {
+      await deleteRawRecord(record.id);
+      setRecords(current => current.filter(item => item.id !== record.id));
+      setSourceRecords(current => current.filter(item => item.id !== record.id));
+      setSaveSuccess("Raw record deleted.");
+    } catch (error) {
+      setSaveError(error.message || "Failed to delete raw record.");
+    }
+  }
+
   function removeSourceRecord(recordId) {
     setSourceRecords(current =>
       current.filter(record => record.id !== recordId)
     );
+    setActiveMatchTab("master");
   }
 
   async function saveSelectedRecord() {
@@ -174,6 +251,7 @@ function RecordMap({
       );
       setSelectedRecord(null);
       setSourceRecords([]);
+      setActiveMatchTab("master");
     } catch (error) {
       console.error(error);
       setSaveError(
@@ -269,17 +347,20 @@ function RecordMap({
 
       <div className="record-map-frame">
         <LeafletMap
-          records={visibleRecords}
+          records={mapRecords}
           onSelectRecord={handleSelectRecord}
           onAddSourceRecord={
             selectedRecord?.mapSource === "saved"
               ? undefined
               : handleAddSourceRecord
           }
+          onEditRawRecord={handleEditRawRecord}
+          onDeleteRawRecord={handleDeleteRawRecord}
           masterRecordId={selectedRecord?.id}
           sourceRecordIds={sourceRecords.map(record => record.id)}
           initialView={mapView}
           onViewChange={onMapViewChange}
+          focusedRecord={rawDraft}
         />
       </div>
 
@@ -323,52 +404,112 @@ function RecordMap({
             </button>
           </div>
 
-          <MasterRecord
-            record={selectedRecord}
-            onChange={updateSelectedRecord}
-            onSave={saveSelectedRecord}
-            saving={saving}
-            sourceName={
-              selectedRecord.mapSource === "saved"
-                ? "Saved record"
-                : undefined
-            }
-            saveLabel={
-              selectedRecord.mapSource === "saved"
-                ? "Save Changes"
-                : "Save Record"
-            }
-          />
-
           {selectedRecord.mapSource !== "saved" && (
-            <section className="record-map-source-records">
-              <div className="source-records-header">
-                <div>
-                  <h2>Source Records</h2>
-                  <p>
-                    Use “Add as source” in another raw map pin’s popup to
-                    include it in this match.
-                  </p>
-                </div>
-              </div>
+            <div
+              className="record-map-match-tabs"
+              role="tablist"
+              aria-label="Match records"
+            >
+              <button
+                className={activeMatchTab === "master" ? "active" : ""}
+                onClick={() => setActiveMatchTab("master")}
+                role="tab"
+                aria-selected={activeMatchTab === "master"}
+              >
+                Master Record
+              </button>
 
-              {sourceRecords.length === 0 ? (
-                <div className="record-map-source-empty">
-                  No additional source records selected.
-                </div>
-              ) : (
-                <div className="source-record-list">
-                  {sourceRecords.map(record => (
-                    <SourceRecord
-                      key={record.id}
-                      record={record}
-                      onRemove={removeSourceRecord}
-                    />
-                  ))}
-                </div>
-              )}
-            </section>
+              {sourceRecords.map((record, index) => {
+                const tabId = `source:${record.id}`;
+
+                return (
+                  <button
+                    key={record.id}
+                    className={activeMatchTab === tabId ? "active" : ""}
+                    onClick={() => setActiveMatchTab(tabId)}
+                    role="tab"
+                    aria-selected={activeMatchTab === tabId}
+                  >
+                    Source {index + 1}
+                  </button>
+                );
+              })}
+            </div>
           )}
+
+          {activeMatchTab === "master" || selectedRecord.mapSource === "saved" ? (
+            <>
+              <MasterRecord
+                record={selectedRecord}
+                onChange={updateSelectedRecord}
+                onSave={saveSelectedRecord}
+                saving={saving}
+                sourceName={
+                  selectedRecord.mapSource === "saved"
+                    ? "Saved record"
+                    : undefined
+                }
+                saveLabel={
+                  selectedRecord.mapSource === "saved"
+                    ? "Save Changes"
+                    : "Save Record"
+                }
+              />
+
+              {selectedRecord.mapSource !== "saved" && (
+                <p className="record-map-source-hint">
+                  Select another raw map pin and use “Add as source” to add
+                  it as a tab in this match.
+                </p>
+              )}
+            </>
+          ) : (
+            sourceRecords
+              .filter(record =>
+                `source:${record.id}` === activeMatchTab
+              )
+              .map(record => (
+                <SourceRecord
+                  key={record.id}
+                  record={record}
+                  onRemove={removeSourceRecord}
+                />
+              ))
+          )}
+        </section>
+      )}
+
+      {rawDraft && (
+        <section ref={editorRef} className="record-map-editor raw-editor">
+          <div className="record-map-editor-header">
+            <div>
+              <h2>Edit raw source data</h2>
+              <p>
+                Saving writes directly to the raw source file after
+                confirmation.
+              </p>
+            </div>
+
+            <button
+              className="secondary-button"
+              onClick={() => setRawDraft(null)}
+              disabled={saving}
+            >
+              Close editor
+            </button>
+          </div>
+
+          <MasterRecord
+            record={rawDraft}
+            onChange={updateRawDraft}
+            onSave={saveRawDraft}
+            saving={saving}
+            sourceName="Raw source record"
+            saveLabel="Save Raw Changes"
+            recordLabel="Raw Record"
+            recordLabelClassName="raw-record-label"
+            sourceBadge={getRawSourceLabel(rawDraft.source)}
+          />
         </section>
       )}
     </section>
@@ -416,6 +557,16 @@ function hasCoordinates(record) {
     longitude >= -180 &&
     longitude <= 180
   );
+}
+
+function getRawSourceLabel(source) {
+  const labels = {
+    tyha: "TYHA",
+    "marinas-com": "Marinas.com",
+    osm: "OSM"
+  };
+
+  return labels[source] ?? source;
 }
 
 export default RecordMap;

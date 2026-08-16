@@ -60,10 +60,13 @@ function LeafletMap({
   records,
   onSelectRecord,
   onAddSourceRecord,
+  onEditRawRecord,
+  onDeleteRawRecord,
   masterRecordId,
   sourceRecordIds = [],
   initialView,
-  onViewChange
+  onViewChange,
+  focusedRecord
 }) {
   const containerRef = useRef(null);
   const mapRef = useRef(null);
@@ -164,7 +167,11 @@ function LeafletMap({
         record.id !== masterRecordId &&
         !sourceRecordIds.includes(record.id);
 
-      marker.bindPopup(createPopup(record, canAddAsSource));
+      const isRawRecord = record.mapSource !== "saved";
+
+      marker.bindPopup(
+        createPopup(record, canAddAsSource, isRawRecord)
+      );
       marker.on("popupopen", event => {
         const editButton =
           event.popup
@@ -186,6 +193,28 @@ function LeafletMap({
           clickEvent.preventDefault();
           clickEvent.stopPropagation();
           onAddSourceRecord?.(record);
+        });
+
+        const editRawButton =
+          event.popup.getElement()?.querySelector(
+            ".record-map-edit-raw-button"
+          );
+
+        editRawButton?.addEventListener("click", clickEvent => {
+          clickEvent.preventDefault();
+          clickEvent.stopPropagation();
+          onEditRawRecord?.(record);
+        });
+
+        const deleteRawButton =
+          event.popup.getElement()?.querySelector(
+            ".record-map-delete-raw-button"
+          );
+
+        deleteRawButton?.addEventListener("click", clickEvent => {
+          clickEvent.preventDefault();
+          clickEvent.stopPropagation();
+          onDeleteRawRecord?.(record);
         });
       });
       marker.addTo(markers);
@@ -209,9 +238,35 @@ function LeafletMap({
     ready,
     onSelectRecord,
     onAddSourceRecord,
+    onEditRawRecord,
+    onDeleteRawRecord,
     masterRecordId,
     sourceRecordIds
   ]);
+
+  useEffect(() => {
+    if (!ready || !mapRef.current || !focusedRecord) return;
+
+    const latitude = Number(focusedRecord.latitude);
+    const longitude = Number(focusedRecord.longitude);
+
+    if (
+      focusedRecord.latitude !== null &&
+      focusedRecord.latitude !== undefined &&
+      focusedRecord.latitude !== "" &&
+      focusedRecord.longitude !== null &&
+      focusedRecord.longitude !== undefined &&
+      focusedRecord.longitude !== "" &&
+      Number.isFinite(latitude) &&
+      Number.isFinite(longitude) &&
+      latitude >= -90 &&
+      latitude <= 90 &&
+      longitude >= -180 &&
+      longitude <= 180
+    ) {
+      mapRef.current.panTo([latitude, longitude]);
+    }
+  }, [ready, focusedRecord?.latitude, focusedRecord?.longitude]);
 
   if (error) {
     return <div className="record-map-error">{error}</div>;
@@ -237,7 +292,7 @@ function createMarkerIcon(L, source) {
   });
 }
 
-function createPopup(record, canAddAsSource) {
+function createPopup(record, canAddAsSource, isRawRecord) {
   const name = escapeHtml(record.name || "Unnamed marina");
   const source = escapeHtml(
     getSourceName(record.mapSource ?? record.source)
@@ -256,6 +311,10 @@ function createPopup(record, canAddAsSource) {
         <button type="button" class="record-map-add-source-button">
           Add as source
         </button>
+      ` : ""}
+      ${isRawRecord ? `
+        <button type="button" class="record-map-edit-raw-button">Edit raw data</button>
+        <button type="button" class="record-map-delete-raw-button">Delete raw data</button>
       ` : ""}
     </div>
   `;

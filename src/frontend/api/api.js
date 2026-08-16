@@ -119,3 +119,33 @@ export async function saveMatch(records) {
 
   return response.json();
 }
+
+export async function updateRawRecord(id, record) {
+  const response = await fetch(
+    `/api/raw-records/${encodeURIComponent(id)}`,
+    {
+      method: "PUT",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(record)
+    }
+  );
+
+  if (!response.ok) {
+    const data = await response.json();
+    throw new Error(data.error || "Failed to update raw record.");
+  }
+
+  return response.json();
+}
+
+export async function deleteRawRecord(id) {
+  const response = await fetch(
+    `/api/raw-records/${encodeURIComponent(id)}`,
+    { method: "DELETE" }
+  );
+
+  if (!response.ok) {
+    const data = await response.json();
+    throw new Error(data.error || "Failed to delete raw record.");
+  }
+}
