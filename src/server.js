@@ -180,6 +180,10 @@ app.post("/api/matches", (req, res) => {
         masterRecord.name ??
         createdRecord.name,
 
+      type:
+        masterRecord.type ??
+        createdRecord.type,
+
       description:
         masterRecord.description ??
         createdRecord.description,

@@ -1,0 +1,28 @@
+{
+  "id": "MARINA-00009",
+  "name": "East Harbour",
+  "type": null,
+  "description": null,
+  "latitude": 54.2826039,
+  "longitude": -0.3882452,
+  "address": {
+    "street": null,
+    "city": null,
+    "postcode": null,
+    "country": null
+  },
+  "phone": null,
+  "email": null,
+  "website": null,
+  "berths": null,
+  "facilities": [],
+  "images": [],
+  "sourceRecords": [
+    {
+      "id": "osm:way:185021656",
+      "source": "osm"
+    }
+  ],
+  "createdAt": "2026-08-16T17:23:18.761Z",
+  "updatedAt": "2026-08-16T17:23:18.761Z"
+}

@@ -22,6 +22,10 @@ export function createMatch(records) {
       primaryRecord.name ??
       null,
 
+    type:
+      primaryRecord.type ??
+      null,
+
     description:
       primaryRecord.description ??
       null,

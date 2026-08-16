@@ -1,0 +1,56 @@
+{
+  "id": "MARINA-00007",
+  "name": "Boatfolk - Royal Quays Marina",
+  "description": "Widely regarded as the premier boating facility in the north of England, Royal Quays Marina is situated in the historic Albert Edward Dock, close to the mouth of the River Tyne and ideally placed for access to the open sea and for cruising on the sheltered waters of the River Tyne.",
+  "latitude": 54.995855,
+  "longitude": -1.453596,
+  "address": [
+    "Boatfolk - Royal Quays Marina",
+    "Albert Edward Dock",
+    "Coble Dene Road",
+    "North Shields",
+    "NE29 6DU",
+    "Tyne and Wear, England",
+    "United Kingdom"
+  ],
+  "phone": "0191 272 8282",
+  "email": "royalquays@boatfolk.co.uk",
+  "website": "https://www.boatfolk.co.uk/royal-quays-marina",
+  "berths": 400,
+  "facilities": [
+    "Boat Care / Valeting",
+    "Boat hoist / Lift out",
+    "Boat Sales / Broker",
+    "Boat storage",
+    "Boat yard",
+    "Café / Coffee Shop",
+    "Car Parking",
+    "Customer Lounge",
+    "Electricity to Berths",
+    "Fuel Dock (Diesel)",
+    "Fuel Dock (Petrol)",
+    "Launderette",
+    "Pump out",
+    "Restaurant / Bar",
+    "Toilets & Showers (individual en-suite style facilities)",
+    "Toilets & Showers (traditional style)",
+    "Water to Berths",
+    "Wi-Fi"
+  ],
+  "images": [
+    "https://www.tyha.co.uk/GenerateImage.aspx?file=/images/galleries/gallery351/1106_Royal Quays Aerial. Low Res..jpg&resize=T&keepRatio=T&maxWidth=600&maxHeight=600",
+    "https://www.tyha.co.uk/GenerateImage.aspx?file=/images/galleries/gallery351/1107_Royal Quays View 1. Low Res..jpg&resize=T&keepRatio=T&maxWidth=600&maxHeight=600",
+    "https://www.tyha.co.uk/GenerateImage.aspx?file=/images/galleries/gallery351/1108_RQM Cafe View. Low Res..jpg&resize=T&keepRatio=T&maxWidth=600&maxHeight=600",
+    "https://www.tyha.co.uk/GenerateImage.aspx?file=/images/galleries/gallery351/1109_RQM Interior Showers. Low Res..jpg&resize=T&keepRatio=T&maxWidth=600&maxHeight=600",
+    "https://www.tyha.co.uk/GenerateImage.aspx?file=/images/galleries/gallery351/1110_RQM Lifestyle. Low Res.jpg&resize=T&keepRatio=T&maxWidth=600&maxHeight=600",
+    "https://www.tyha.co.uk/images/galleries/gallery351/1106_Royal Quays Aerial. Low Res..jpg"
+  ],
+  "sourceRecords": [
+    {
+      "id": "tyha:339",
+      "source": "tyha"
+    }
+  ],
+  "createdAt": "2026-08-16T17:17:13.470Z",
+  "updatedAt": "2026-08-16T17:17:13.470Z"
+}

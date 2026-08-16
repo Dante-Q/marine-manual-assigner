@@ -75,6 +75,14 @@ function MasterRecord({
         />
 
         <EditableField
+          label="Type"
+          value={record.type}
+          onChange={value =>
+            onChange("type", value)
+          }
+        />
+
+        <EditableField
           label="Description"
           value={record.description}
           onChange={value =>

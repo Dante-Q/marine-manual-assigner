@@ -1,0 +1,42 @@
+{
+  "id": "MARINA-00008",
+  "name": "Scarborough Harbour",
+  "type": "Fuel",
+  "description": "Scarborough Harbour, Scarborough, GB, United Kingdom Marina. Find marina reviews, phone number, boat and yacht docks, slips, and moorings for rent at Scarborough Harbour.",
+  "latitude": 54.281667,
+  "longitude": -0.388667,
+  "address": {
+    "street": "On the North Sea",
+    "city": "Scarborough",
+    "county": null,
+    "region": "GB",
+    "postcode": null,
+    "country": "GB"
+  },
+  "phone": null,
+  "email": null,
+  "website": "https://dockwa.zendesk.com/hc/en-us/articles/13008712453271-Update-Your-Public-Profile-And-Manage-Settings-In-Dockwa-and-Marinas-com",
+  "berths": null,
+  "facilities": [],
+  "images": [
+    "https://img.marinas.com/v2/1f310e9538ffde6b17b56c5f96ef8e7e90d8ee9076876a6c9780f9d9643d9e39.jpg",
+    "https://img.marinas.com/v2/d2d03b179c6e023f047d4fff6c3e5c9602f5155ac5b5995a578b12de05087514.jpg",
+    "https://img.marinas.com/v2/fffda238fe22d6662a5069e9e9a0a18cb85cd018acff12c0c425089fc142fcac.jpg",
+    "https://img.marinas.com/v2/ae6e9baa1506c31d03c7f9f4bb5d12746a0d8a765720b4b6012fe0cf90d98f68.jpg",
+    "https://img.marinas.com/v2/ddbb4f8474904c0dd59c36142a033fd4b916cd5ee1e70a63958bd5f095f6d1ea.jpg",
+    "https://img.marinas.com/v2/063f6396c0ceac3cf35fd87c102a9805692fd40701ba8a768a4300ccc686e74f.jpg",
+    "https://img.marinas.com/v2/3d1cb08c2d5167c7d7d7fdc9c5b153039499b412d23b05576527b9be499a4842.jpg",
+    "https://img.marinas.com/v2/5b09775ae5e927fb854055644f7e1070048bb1a91f29b8eb485360e8ac00d94c.jpg",
+    "https://img.marinas.com/v2/d1894405293b0cc2aec20054afb71270f56b6753633bc21dc3ba7728f316a253.jpg",
+    "https://img.marinas.com/v2/0476c9e64a3369dda9716f828686342edadce9ae436c75c9ac1f07920e934918.jpg",
+    "https://img.marinas.com/v2/c8379701093d3b1d512bc65d36bfb621d35d2058b6e470106b86c4e8981ebed3.jpg"
+  ],
+  "sourceRecords": [
+    {
+      "id": "marinas-com:2gcv8j",
+      "source": "marinas-com"
+    }
+  ],
+  "createdAt": "2026-08-16T17:21:45.816Z",
+  "updatedAt": "2026-08-16T17:22:19.736Z"
+}

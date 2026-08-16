@@ -700,6 +700,11 @@ function SavedRecordDetail({
         />
 
         <DetailField
+          label="Type"
+          value={record.type}
+        />
+
+        <DetailField
           label="Description"
           value={record.description}
         />
