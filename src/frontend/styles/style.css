@@ -570,6 +570,15 @@ a:hover {
   flex-shrink: 0;
 }
 
+.inspector-save-error {
+  margin-bottom: 16px;
+  padding: 11px 14px;
+  background: rgba(239, 83, 80, 0.1);
+  border: 1px solid rgba(239, 83, 80, 0.32);
+  border-radius: var(--radius);
+  color: var(--danger);
+}
+
 /* =========================================================
    LOCATION MAP
    ========================================================= */

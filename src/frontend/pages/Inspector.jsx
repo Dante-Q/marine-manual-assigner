@@ -1,10 +1,13 @@
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 
 import LocationMap from "../components/LocationMap.jsx";
+import MasterRecord from "../components/matcher/MasterRecord.jsx";
+import { updateMatch } from "../api/api.js";
 
 function Inspector({
   records,
   savedRecords,
+  setSavedRecords,
   onCreateMaster
 }) {
   const [selectedSource, setSelectedSource] =
@@ -429,6 +432,7 @@ function Inspector({
               showingSaved ? (
                 <SavedRecordDetail
                   record={selectedRecord}
+                  setSavedRecords={setSavedRecords}
                 />
               ) : (
                 <RecordDetail
@@ -652,8 +656,92 @@ function RecordDetail({
 }
 
 function SavedRecordDetail({
-  record
+  record,
+  setSavedRecords
 }) {
+  const [editing, setEditing] = useState(false);
+  const [draft, setDraft] = useState(record);
+  const [saving, setSaving] = useState(false);
+  const [error, setError] = useState(null);
+
+  useEffect(() => {
+    setEditing(false);
+    setDraft(record);
+    setError(null);
+  }, [record.id]);
+
+  function updateDraft(field, value) {
+    setDraft(current => ({
+      ...current,
+      [field]: value
+    }));
+  }
+
+  async function saveChanges() {
+    setSaving(true);
+    setError(null);
+
+    try {
+      const saved = await updateMatch(record.id, draft);
+
+      setSavedRecords(current =>
+        current.map(item =>
+          item.id === saved.id ? saved : item
+        )
+      );
+      setDraft(saved);
+      setEditing(false);
+    } catch (saveError) {
+      console.error(saveError);
+      setError(
+        saveError.message || "Failed to update saved record."
+      );
+    } finally {
+      setSaving(false);
+    }
+  }
+
+  if (editing) {
+    return (
+      <>
+        <div className="detail-header">
+          <div>
+            <div className="detail-source-row">
+              <span className="source-label">Saved Record</span>
+              <span className="saved-badge">{record.id}</span>
+            </div>
+            <h2>Edit Saved Record</h2>
+          </div>
+
+          <div className="detail-actions">
+            <button
+              className="secondary-button"
+              onClick={() => {
+                setDraft(record);
+                setEditing(false);
+              }}
+              disabled={saving}
+            >
+              Cancel
+            </button>
+          </div>
+        </div>
+
+        {error && <div className="inspector-save-error">{error}</div>}
+
+        <MasterRecord
+          record={draft}
+          onChange={updateDraft}
+          onSave={saveChanges}
+          saving={saving}
+          sourceName="Saved record"
+          recordLabel="Saved Record"
+          saveLabel="Save Changes"
+        />
+      </>
+    );
+  }
+
   return (
     <>
       <div className="detail-header">
@@ -677,6 +765,15 @@ function SavedRecordDetail({
               "Unnamed marina"}
           </h2>
 
+        </div>
+
+        <div className="detail-actions">
+          <button
+            className="primary-button"
+            onClick={() => setEditing(true)}
+          >
+            Edit Record
+          </button>
         </div>
 
       </div>

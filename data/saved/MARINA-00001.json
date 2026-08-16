@@ -7,7 +7,7 @@
   "address": {
     "street": "South Beach",
     "city": "Pwllheli",
-    "postcode": "LL53 5YT",
+    "postcode": "LL53 5YTT",
     "country": "United Kingdom"
   },
   "phone": "+44 1758 613983",
@@ -21,7 +21,8 @@
     "Showers",
     "Toilets",
     "Laundry",
-    "WiFi"
+    "WiFi",
+    "our boats!"
   ],
   "images": [],
   "sourceRecords": [
@@ -39,5 +40,5 @@
     }
   ],
   "createdAt": "2026-08-16T12:00:00.000Z",
-  "updatedAt": "2026-08-16T12:00:00.000Z"
+  "updatedAt": "2026-08-16T18:02:04.091Z"
 }
