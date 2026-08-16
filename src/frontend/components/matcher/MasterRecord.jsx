@@ -107,13 +107,11 @@ function MasterRecord({
           }
         />
 
-        <EditableField
-          label="Address"
-          value={formatAddress(record.address)}
-          onChange={value =>
-            onChange("address", value)
+        <AddressFields
+          address={record.address}
+          onChange={address =>
+            onChange("address", address)
           }
-          textarea
         />
 
         <EditableField
@@ -343,33 +341,57 @@ function FacilitiesField({
   );
 }
 
-function formatAddress(address) {
-  if (!address) {
-    return "";
-  }
+function AddressFields({ address, onChange }) {
+  const normalized = normalizeAddress(address);
 
-  if (typeof address === "string") {
-    return address;
-  }
+  return (
+    <div className="master-record-field address-fields">
+      <label>Address</label>
+
+      <div className="address-field-grid">
+        <AddressInput label="Street" value={normalized.street}
+          onChange={value => onChange({ ...normalized, street: value || null })} />
+        <AddressInput label="City" value={normalized.city}
+          onChange={value => onChange({ ...normalized, city: value || null })} />
+        <AddressInput label="Postcode" value={normalized.postcode}
+          onChange={value => onChange({ ...normalized, postcode: value || null })} />
+        <AddressInput label="Country" value={normalized.country}
+          onChange={value => onChange({ ...normalized, country: value || null })} />
+      </div>
+
+      <span className="facility-help">Saved as a structured address object.</span>
+    </div>
+  );
+}
+
+function AddressInput({ label, value, onChange }) {
+  return (
+    <label className="address-input">
+      <span>{label}</span>
+      <input type="text" value={value ?? ""}
+        onChange={event => onChange(event.target.value)} />
+    </label>
+  );
+}
+
+function normalizeAddress(address) {
+  const emptyAddress = { street: null, city: null, postcode: null, country: null };
 
   if (Array.isArray(address)) {
-    return address
-      .filter(Boolean)
-      .join(", ");
+    return { ...emptyAddress, street: address.filter(Boolean).join(", ") || null };
   }
 
-  if (typeof address === "object") {
-    return Object.values(address)
-      .filter(
-        value =>
-          value !== null &&
-          value !== undefined &&
-          value !== ""
-      )
-      .join(", ");
+  if (typeof address === "object" && address) {
+    return {
+      ...emptyAddress,
+      street: address.street ?? null,
+      city: address.city ?? null,
+      postcode: address.postcode ?? null,
+      country: address.country ?? null
+    };
   }
 
-  return String(address);
+  return address ? { ...emptyAddress, street: String(address) } : emptyAddress;
 }
 
 function normalizeFacilities(facilities) {

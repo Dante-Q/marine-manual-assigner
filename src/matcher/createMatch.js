@@ -39,8 +39,7 @@ export function createMatch(records) {
       null,
 
     address:
-      primaryRecord.address ??
-      null,
+      normalizeAddress(primaryRecord.address),
 
     phone:
       primaryRecord.phone ??
@@ -77,4 +76,24 @@ export function createMatch(records) {
     updatedAt:
       new Date().toISOString()
   };
+}
+
+export function normalizeAddress(address) {
+  const emptyAddress = { street: null, city: null, postcode: null, country: null };
+
+  if (typeof address === "object" && address && !Array.isArray(address)) {
+    return {
+      ...emptyAddress,
+      street: address.street ?? null,
+      city: address.city ?? null,
+      postcode: address.postcode ?? null,
+      country: address.country ?? null
+    };
+  }
+
+  if (Array.isArray(address)) {
+    return { ...emptyAddress, street: address.filter(Boolean).join(", ") || null };
+  }
+
+  return address ? { ...emptyAddress, street: String(address) } : emptyAddress;
 }

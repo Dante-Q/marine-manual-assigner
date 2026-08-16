@@ -13,7 +13,7 @@ import {
   getSavedRecord
 } from "./savedRecords.js";
 
-import { createMatch } from "./matcher/createMatch.js";
+import { createMatch, normalizeAddress } from "./matcher/createMatch.js";
 import { saveMatch } from "./matcher/saveMatch.js";
 
 const __filename = fileURLToPath(import.meta.url);
@@ -197,8 +197,7 @@ app.post("/api/matches", (req, res) => {
         createdRecord.longitude,
 
       address:
-        masterRecord.address ??
-        createdRecord.address,
+        normalizeAddress(masterRecord.address ?? createdRecord.address),
 
       phone:
         masterRecord.phone ??

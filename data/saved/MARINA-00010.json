@@ -1,0 +1,28 @@
+{
+  "id": "MARINA-00010",
+  "name": "St Mary's Harbour",
+  "type": null,
+  "description": null,
+  "latitude": 49.9167813,
+  "longitude": -6.315077,
+  "address": {
+    "street": "street",
+    "city": "city",
+    "postcode": "syyy",
+    "country": "UK"
+  },
+  "phone": null,
+  "email": null,
+  "website": null,
+  "berths": null,
+  "facilities": [],
+  "images": [],
+  "sourceRecords": [
+    {
+      "id": "osm:node:3470962516",
+      "source": "osm"
+    }
+  ],
+  "createdAt": "2026-08-16T17:45:13.889Z",
+  "updatedAt": "2026-08-16T17:45:13.890Z"
+}
