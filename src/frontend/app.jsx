@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 import { fetchRecords } from "./api/api.js";
 import Inspector from "./pages/Inspector.jsx";
+import Matcher from "./pages/Matcher.jsx";
 
 function App() {
   const [records, setRecords] = useState([]);
@@ -47,9 +48,7 @@ function App() {
   return (
     <>
       <header className="topbar">
-
         <div className="brand">
-
           <h1>
             Marina Manual Assigner
           </h1>
@@ -57,11 +56,9 @@ function App() {
           <p>
             Marina data review and matching
           </p>
-
         </div>
 
         <nav className="navbar">
-
           <button
             className={`nav-button ${
               page === "inspector"
@@ -87,13 +84,10 @@ function App() {
           >
             Matcher
           </button>
-
         </nav>
-
       </header>
 
       <main className="app">
-
         {page === "inspector" && (
           <Inspector
             records={records}
@@ -101,11 +95,10 @@ function App() {
         )}
 
         {page === "matcher" && (
-          <div className="page-placeholder">
-            Matcher
-          </div>
+          <Matcher
+            records={records}
+          />
         )}
-
       </main>
     </>
   );

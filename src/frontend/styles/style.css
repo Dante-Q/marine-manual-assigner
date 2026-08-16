@@ -1145,3 +1145,51 @@ a:hover {
   gap: 8px;
   flex-wrap: wrap;
 }
+
+
+/* =========================================================
+   MATCHER ADD ANOTHER
+   ========================================================= */
+
+.matcher-add-another {
+  display: flex;
+  justify-content: center;
+
+  margin-top: 20px;
+}
+
+/* =========================================================
+   MATCHER SEARCH MODE
+   ========================================================= */
+
+.add-record-panel {
+  width: 100%;
+  margin-top: 0;
+}
+
+.matcher-search-results {
+  background: var(--bg-secondary);
+}
+
+.matcher-search-result:last-child {
+  border-bottom: 0;
+}
+
+/* =========================================================
+   MATCHER CONTENT FLOW
+   ========================================================= */
+
+.matcher-content {
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+}
+
+/* =========================================================
+   MATCHER RECORD SPACING
+   ========================================================= */
+
+.matcher-records {
+  gap: 14px;
+  margin-bottom: 20px;
+}
