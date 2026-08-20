@@ -43,7 +43,7 @@ function RecordMap({
   mapView,
   onMapViewChange
 }) {
-  const [selectedSources, setSelectedSources] = useState(() => new Set(["all"]));
+  const [selectedSources, setSelectedSources] = useState(() => new Set(["saved"]));
   const [selectedRecord, setSelectedRecord] = useState(null);
   const [sourceRecords, setSourceRecords] = useState([]);
   const [activeMatchTab, setActiveMatchTab] = useState("master");
@@ -230,6 +230,12 @@ function RecordMap({
     );
   }
 
+  const activeEditorKey = rawDraft
+    ? `raw:${rawDraft.id}`
+    : selectedRecord
+    ? `record:${selectedRecord.id}`
+    : null;
+
   useEffect(() => {
     if (selectedRecord || rawDraft) {
       pageRef.current?.scrollTo({
@@ -237,7 +243,7 @@ function RecordMap({
         behavior: "smooth",
       });
     }
-  }, [selectedRecord, rawDraft]);
+  }, [activeEditorKey]);
 
   function handleSourceChange(source) {
     setSelectedSources(current => {

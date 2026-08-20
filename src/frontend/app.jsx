@@ -15,7 +15,7 @@ function App() {
     useState([]);
 
   const [page, setPage] =
-    useState("inspector");
+    useState("record-map");
 
   const [initialMasterRecord, setInitialMasterRecord] =
     useState(null);
