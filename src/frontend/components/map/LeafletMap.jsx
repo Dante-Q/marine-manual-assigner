@@ -62,6 +62,7 @@ function LeafletMap({
   onAddSourceRecord,
   onEditRawRecord,
   onDeleteRawRecord,
+  onToggleRawRecordHidden,
   masterRecordId,
   sourceRecordIds = [],
   initialView,
@@ -246,6 +247,17 @@ function LeafletMap({
           clickEvent.stopPropagation();
           onDeleteRawRecord?.(record);
         });
+
+        const toggleHiddenButton =
+          event.popup.getElement()?.querySelector(
+            ".record-map-toggle-hidden-button"
+          );
+
+        toggleHiddenButton?.addEventListener("click", clickEvent => {
+          clickEvent.preventDefault();
+          clickEvent.stopPropagation();
+          onToggleRawRecordHidden?.(record);
+        });
       });
       marker.addTo(markers);
       bounds.push([latitude, longitude]);
@@ -270,6 +282,7 @@ function LeafletMap({
     onAddSourceRecord,
     onEditRawRecord,
     onDeleteRawRecord,
+    onToggleRawRecordHidden,
     masterRecordId,
     sourceRecordIds,
     draggableRecordId,
@@ -364,6 +377,9 @@ function createPopup(record, canAddAsSource, isRawRecord) {
         <div class="record-map-popup-actions raw-actions">
           <button type="button" class="record-map-edit-raw-button">Edit raw data</button>
           <button type="button" class="record-map-delete-raw-button">Delete raw data</button>
+          <button type="button" class="record-map-toggle-hidden-button">
+            ${record.isHiddenPin ? "Unhide raw pin" : "Hide raw pin"}
+          </button>
         </div>
       ` : ""}
     </div>

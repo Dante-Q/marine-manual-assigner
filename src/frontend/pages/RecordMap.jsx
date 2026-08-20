@@ -16,6 +16,25 @@ import {
   updateMatch
 } from "../api/api.js";
 
+const HIDDEN_RAW_PINS_KEY = "marina-manual-assigner:hidden-raw-pins";
+
+function loadHiddenRawPinIds() {
+  try {
+    const value = JSON.parse(localStorage.getItem(HIDDEN_RAW_PINS_KEY) ?? "[]");
+    return new Set(Array.isArray(value) ? value : []);
+  } catch {
+    return new Set();
+  }
+}
+
+function saveHiddenRawPinIds(ids) {
+  try {
+    localStorage.setItem(HIDDEN_RAW_PINS_KEY, JSON.stringify([...ids]));
+  } catch {
+    // Pin visibility still works for this session if storage is unavailable.
+  }
+}
+
 function RecordMap({
   records,
   setRecords,
@@ -30,6 +49,8 @@ function RecordMap({
   const [activeMatchTab, setActiveMatchTab] = useState("master");
   const [rawDraft, setRawDraft] = useState(null);
   const [hideMatchedPins, setHideMatchedPins] = useState(false);
+  const [hiddenRawPinIds, setHiddenRawPinIds] = useState(loadHiddenRawPinIds);
+  const [showHiddenPins, setShowHiddenPins] = useState(false);
   const [mapSearch, setMapSearch] = useState("");
   const [mapFocusRecord, setMapFocusRecord] = useState(null);
   const [mapFocusToken, setMapFocusToken] = useState(0);
@@ -87,9 +108,13 @@ function RecordMap({
 
       return (
         matchesSource &&
+        (showHiddenPins || !hiddenRawPinIds.has(record.id)) &&
         (!hideMatchedPins || !matchedRecordIds.has(record.id))
       );
-    });
+    }).map(record => ({
+      ...record,
+      isHiddenPin: hiddenRawPinIds.has(record.id)
+    }));
 
     return [...rawPins, ...savedPins].filter(hasCoordinates);
   }, [
@@ -97,6 +122,8 @@ function RecordMap({
     savedRecords,
     selectedSources,
     hideMatchedPins,
+    hiddenRawPinIds,
+    showHiddenPins,
     matchedRecordIds
   ]);
 
@@ -241,6 +268,9 @@ function RecordMap({
 
   function focusMapRecord(record) {
     setSelectedSources(new Set(["all"]));
+    if (hiddenRawPinIds.has(record.id)) {
+      setShowHiddenPins(true);
+    }
     setMapFocusRecord(record);
     setMapFocusToken(current => current + 1);
     setMapSearch("");
@@ -258,6 +288,21 @@ function RecordMap({
       ...current,
       [field]: value
     }));
+  }
+
+  function toggleRawPinHidden(record) {
+    setHiddenRawPinIds(current => {
+      const next = new Set(current);
+
+      if (next.has(record.id)) {
+        next.delete(record.id);
+      } else {
+        next.add(record.id);
+      }
+
+      saveHiddenRawPinIds(next);
+      return next;
+    });
   }
 
   async function saveRawDraft() {
@@ -293,6 +338,12 @@ function RecordMap({
       await deleteRawRecord(record.id);
       setRecords(current => current.filter(item => item.id !== record.id));
       setSourceRecords(current => current.filter(item => item.id !== record.id));
+      setHiddenRawPinIds(current => {
+        const next = new Set(current);
+        next.delete(record.id);
+        saveHiddenRawPinIds(next);
+        return next;
+      });
       setSaveSuccess("Raw record deleted.");
     } catch (error) {
       setSaveError(error.message || "Failed to delete raw record.");
@@ -479,6 +530,15 @@ function RecordMap({
             Hide matched raw pins
           </label>
 
+          <label>
+            <input
+              type="checkbox"
+              checked={showHiddenPins}
+              onChange={event => setShowHiddenPins(event.target.checked)}
+            />
+            Show hidden raw pins ({hiddenRawPinIds.size})
+          </label>
+
         </div>
       </div>
 
@@ -494,6 +554,7 @@ function RecordMap({
           }
           onEditRawRecord={handleEditRawRecord}
           onDeleteRawRecord={handleDeleteRawRecord}
+          onToggleRawRecordHidden={toggleRawPinHidden}
           masterRecordId={selectedRecord?.id}
           sourceRecordIds={sourceRecords.map(record => record.id)}
           initialView={mapView}

@@ -1293,7 +1293,8 @@ a:hover {
 }
 
 .record-map-edit-raw-button,
-.record-map-delete-raw-button {
+.record-map-delete-raw-button,
+.record-map-toggle-hidden-button {
   padding: 5px 8px;
   background: #fff1f1;
   border: 1px solid #ef8585;
@@ -1309,6 +1310,13 @@ a:hover {
   color: white;
 }
 
+.record-map-toggle-hidden-button {
+  grid-column: 1 / -1;
+  color: #805600;
+  background: #fff8e1;
+  border-color: #e4b84e;
+}
+
 .record-map-edit-raw-button:hover {
   background: #ffe1e1;
   border-color: #df5a5a;
@@ -1317,6 +1325,12 @@ a:hover {
 .record-map-delete-raw-button:hover {
   background: #c53030;
   border-color: #c53030;
+}
+
+.record-map-toggle-hidden-button:hover {
+  color: #644300;
+  background: #ffefb8;
+  border-color: #cc9822;
 }
 
 .raw-editor .master-record {
