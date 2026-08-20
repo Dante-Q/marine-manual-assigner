@@ -770,6 +770,7 @@ function SavedRecordDetail({
           onChange={updateDraft}
           onSave={saveChanges}
           saving={saving}
+          locationEditable
           sourceName="Saved record"
           recordLabel="Saved Record"
           saveLabel="Save Changes"

@@ -394,6 +394,7 @@ async function handleSave() {
         onChange={updateMasterRecord}
         onSave={handleSave}
         saving={saving}
+        locationEditable
       />
 
       <section className="source-records-section">

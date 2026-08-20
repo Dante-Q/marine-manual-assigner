@@ -24,13 +24,12 @@ function RecordMap({
   mapView,
   onMapViewChange
 }) {
-  const [selectedSource, setSelectedSource] = useState("all");
+  const [selectedSources, setSelectedSources] = useState(() => new Set(["all"]));
   const [selectedRecord, setSelectedRecord] = useState(null);
   const [sourceRecords, setSourceRecords] = useState([]);
   const [activeMatchTab, setActiveMatchTab] = useState("master");
   const [rawDraft, setRawDraft] = useState(null);
   const [hideMatchedPins, setHideMatchedPins] = useState(false);
-  const [showSavedPins, setShowSavedPins] = useState(true);
   const [mapSearch, setMapSearch] = useState("");
   const [mapFocusRecord, setMapFocusRecord] = useState(null);
   const [mapFocusToken, setMapFocusToken] = useState(0);
@@ -41,7 +40,7 @@ function RecordMap({
   const editorRef = useRef(null);
 
   const counts = useMemo(() => ({
-    all: records.length,
+    all: records.length + savedRecords.length,
     tyha: records.filter(record => record.source === "tyha").length,
     "marinas-com": records.filter(
       record => record.source === "marinas-com"
@@ -73,21 +72,18 @@ function RecordMap({
   }, [savedRecords]);
 
   const visibleRecords = useMemo(() => {
-    const savedPins = showSavedPins
+    const showAllSources = selectedSources.has("all");
+    const savedPins = (showAllSources || selectedSources.has("saved"))
       ? savedRecords.map(record => ({
           ...record,
           mapSource: "saved"
         }))
       : [];
 
-    if (selectedSource === "saved") {
-      return savedPins.filter(hasCoordinates);
-    }
-
     const rawPins = records.filter(record => {
       const matchesSource =
-        selectedSource === "all" ||
-        record.source === selectedSource;
+        showAllSources ||
+        selectedSources.has(record.source);
 
       return (
         matchesSource &&
@@ -99,9 +95,8 @@ function RecordMap({
   }, [
     records,
     savedRecords,
-    selectedSource,
+    selectedSources,
     hideMatchedPins,
-    showSavedPins,
     matchedRecordIds
   ]);
 
@@ -218,7 +213,25 @@ function RecordMap({
   }, [selectedRecord, rawDraft]);
 
   function handleSourceChange(source) {
-    setSelectedSource(source);
+    setSelectedSources(current => {
+      if (source === "all") {
+        return new Set(["all"]);
+      }
+
+      const next = new Set(current);
+
+      if (next.has("all")) {
+        return new Set([source]);
+      }
+
+      if (next.has(source)) {
+        next.delete(source);
+      } else {
+        next.add(source);
+      }
+
+      return next;
+    });
     setSelectedRecord(null);
     setSourceRecords([]);
     setActiveMatchTab("master");
@@ -227,8 +240,7 @@ function RecordMap({
   }
 
   function focusMapRecord(record) {
-    setSelectedSource("all");
-    setShowSavedPins(true);
+    setSelectedSources(new Set(["all"]));
     setMapFocusRecord(record);
     setMapFocusToken(current => current + 1);
     setMapSearch("");
@@ -390,56 +402,56 @@ function RecordMap({
           source="all"
           label="All Records"
           count={counts.all}
-          selectedSource={selectedSource}
+          selected={selectedSources.has("all")}
           onSelect={handleSourceChange}
         />
         <SourceFilter
           source="tyha"
           label="TYHA"
           count={counts.tyha}
-          selectedSource={selectedSource}
+          selected={selectedSources.has("tyha")}
           onSelect={handleSourceChange}
         />
         <SourceFilter
           source="marinas-com"
           label="Marinas.com"
           count={counts["marinas-com"]}
-          selectedSource={selectedSource}
+          selected={selectedSources.has("marinas-com")}
           onSelect={handleSourceChange}
         />
         <SourceFilter
           source="osm"
           label="OSM"
           count={counts.osm}
-          selectedSource={selectedSource}
+          selected={selectedSources.has("osm")}
           onSelect={handleSourceChange}
         />
         <SourceFilter
           source="tyha-IE"
           label="TYHA-IE"
           count={counts["tyha-IE"]}
-          selectedSource={selectedSource}
+          selected={selectedSources.has("tyha-IE")}
           onSelect={handleSourceChange}
         />
         <SourceFilter
           source="marinas-com-IE"
           label="Marinas.com-IE"
           count={counts["marinas-com-IE"]}
-          selectedSource={selectedSource}
+          selected={selectedSources.has("marinas-com-IE")}
           onSelect={handleSourceChange}
         />
         <SourceFilter
           source="osm-IE"
           label="OSM-IE"
           count={counts["osm-IE"]}
-          selectedSource={selectedSource}
+          selected={selectedSources.has("osm-IE")}
           onSelect={handleSourceChange}
         />
         <SourceFilter
           source="saved"
           label="Saved Records"
           count={counts.saved}
-          selectedSource={selectedSource}
+          selected={selectedSources.has("saved")}
           onSelect={handleSourceChange}
         />
       </div>
@@ -467,16 +479,6 @@ function RecordMap({
             Hide matched raw pins
           </label>
 
-          <label>
-            <input
-              type="checkbox"
-              checked={showSavedPins}
-              onChange={event =>
-                setShowSavedPins(event.target.checked)
-              }
-            />
-            Show saved pins
-          </label>
         </div>
       </div>
 
@@ -592,7 +594,7 @@ function RecordMap({
                 onChange={updateSelectedRecord}
                 onSave={saveSelectedRecord}
                 saving={saving}
-                locationEditable={selectedRecord.mapSource === "saved"}
+                locationEditable
                 sourceName={
                   selectedRecord.source === "manual"
                     ? "Manual entry"
@@ -678,13 +680,14 @@ function LegendItem({ source, label }) {
   );
 }
 
-function SourceFilter({ source, label, count, selectedSource, onSelect }) {
+function SourceFilter({ source, label, count, selected, onSelect }) {
   return (
     <button
       className={`record-map-filter ${
-        selectedSource === source ? "active" : ""
+        selected ? "active" : ""
       }`}
       onClick={() => onSelect(source)}
+      aria-pressed={selected}
     >
       {label}
       <span>{count}</span>
