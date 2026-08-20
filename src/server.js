@@ -221,7 +221,14 @@ app.post("/api/matches", (req, res) => {
 
       images:
         masterRecord.images ??
-        createdRecord.images
+        createdRecord.images,
+
+      sourceRecords:
+        masterRecord.source === "manual"
+          ? createdRecord.sourceRecords.filter(
+              sourceRecord => sourceRecord.id !== masterRecord.id
+            )
+          : createdRecord.sourceRecords
     };
 
     const saved =

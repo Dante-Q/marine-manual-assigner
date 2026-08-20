@@ -68,7 +68,9 @@ function LeafletMap({
   onViewChange,
   focusedRecord,
   focusToken,
-  focusZoom = false
+  focusZoom = false,
+  draggableRecordId,
+  onRecordMove
 }) {
   const containerRef = useRef(null);
   const mapRef = useRef(null);
@@ -114,6 +116,20 @@ function LeafletMap({
         mapRef.current = map;
         markerLayerRef.current = L.layerGroup().addTo(map);
 
+        // Maps mounted by a mode toggle can be measured before the browser has
+        // completed the layout. Re-measure before centering the editable pin.
+        window.requestAnimationFrame(() => {
+          if (!cancelled) {
+            map.invalidateSize();
+            if (initialView) {
+              map.setView(
+                [initialView.latitude, initialView.longitude],
+                initialView.zoom
+              );
+            }
+          }
+        });
+
         map.on("moveend", () => {
           const center = map.getCenter();
 
@@ -157,12 +173,22 @@ function LeafletMap({
       const marker = L.marker(
         [latitude, longitude],
         {
+          draggable: record.id === draggableRecordId,
           icon: createMarkerIcon(
             L,
             record.mapSource ?? record.source
           )
         }
       );
+      if (record.id === draggableRecordId) {
+        marker.on("dragend", event => {
+          const position = event.target.getLatLng();
+          onRecordMove?.({
+            latitude: Number(position.lat.toFixed(6)),
+            longitude: Number(position.lng.toFixed(6))
+          });
+        });
+      }
       const canAddAsSource =
         Boolean(onAddSourceRecord) &&
         record.mapSource !== "saved" &&
@@ -171,9 +197,11 @@ function LeafletMap({
 
       const isRawRecord = record.mapSource !== "saved";
 
-      marker.bindPopup(
-        createPopup(record, canAddAsSource, isRawRecord)
-      );
+      if (record.id !== draggableRecordId) {
+        marker.bindPopup(
+          createPopup(record, canAddAsSource, isRawRecord)
+        );
+      }
       marker.on("popupopen", event => {
         const editButton =
           event.popup
@@ -243,7 +271,9 @@ function LeafletMap({
     onEditRawRecord,
     onDeleteRawRecord,
     masterRecordId,
-    sourceRecordIds
+    sourceRecordIds,
+    draggableRecordId,
+    onRecordMove
   ]);
 
   useEffect(() => {
@@ -292,7 +322,8 @@ function createMarkerIcon(L, source) {
     tyha: "tyha",
     "marinas-com": "marinas-com",
     osm: "osm",
-    saved: "saved"
+    saved: "saved",
+    manual: "manual"
   }[source] ?? "default";
 
   return L.divIcon({

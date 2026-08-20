@@ -101,6 +101,10 @@ function RecordMap({
   ]);
 
   const mapRecords = useMemo(() => {
+    if (selectedRecord?.source === "manual" && hasCoordinates(selectedRecord)) {
+      return [...visibleRecords, selectedRecord];
+    }
+
     if (!rawDraft || !hasCoordinates(rawDraft)) {
       return visibleRecords;
     }
@@ -114,7 +118,7 @@ function RecordMap({
           }
         : record
     );
-  }, [visibleRecords, rawDraft]);
+  }, [visibleRecords, rawDraft, selectedRecord]);
 
   const mapSearchResults = useMemo(() => {
     const query = mapSearch.trim().toLowerCase();
@@ -164,6 +168,40 @@ function RecordMap({
     setSaveError(null);
     setSaveSuccess(null);
   }, []);
+
+  function handleAddManualRecord() {
+    const latitude = mapView?.latitude ?? 54.5;
+    const longitude = mapView?.longitude ?? -3;
+
+    setSelectedRecord({
+      id: "manual:draft",
+      source: "manual",
+      name: "",
+      type: "marina",
+      description: "",
+      latitude: Number(latitude.toFixed(6)),
+      longitude: Number(longitude.toFixed(6)),
+      address: { street: null, city: null, postcode: null, country: null },
+      phone: "",
+      email: "",
+      website: "",
+      berths: "",
+      facilities: [],
+      images: []
+    });
+    setRawDraft(null);
+    setSourceRecords([]);
+    setActiveMatchTab("master");
+    setSaveError(null);
+    setSaveSuccess(null);
+  }
+
+  function handleManualPinMove({ latitude, longitude }) {
+    setSelectedRecord(current => current?.source === "manual"
+      ? { ...current, latitude, longitude }
+      : current
+    );
+  }
 
   useEffect(() => {
     if (selectedRecord || rawDraft) {
@@ -307,6 +345,13 @@ function RecordMap({
             {visibleRecords.length === 1 ? "" : "s"}
           </p>
         </div>
+        <button
+          className="primary-button"
+          onClick={handleAddManualRecord}
+          disabled={saving}
+        >
+          Add manual record
+        </button>
       </header>
 
       <div className="record-map-search">
@@ -425,6 +470,12 @@ function RecordMap({
           focusedRecord={rawDraft ?? mapFocusRecord}
           focusToken={mapFocusToken}
           focusZoom={Boolean(mapFocusRecord) && !rawDraft}
+          draggableRecordId={
+            selectedRecord?.source === "manual"
+              ? selectedRecord.id
+              : undefined
+          }
+          onRecordMove={handleManualPinMove}
         />
       </div>
 
@@ -448,12 +499,16 @@ function RecordMap({
           <div className="record-map-editor-header">
             <div>
               <h2>
-                {selectedRecord.mapSource === "saved"
+                {selectedRecord.source === "manual"
+                  ? "Add manual record"
+                  : selectedRecord.mapSource === "saved"
                   ? "Edit saved record"
                   : "Edit new master record"}
               </h2>
               <p>
-                {selectedRecord.mapSource === "saved"
+                {selectedRecord.source === "manual"
+                  ? "Drag the blue pin on the map to autofill latitude and longitude, then complete the form."
+                  : selectedRecord.mapSource === "saved"
                   ? "Changes update this record in data/saved."
                   : "Changes are saved as a new record in data/saved. The raw source data is never overwritten."}
               </p>
@@ -508,14 +563,19 @@ function RecordMap({
                 onChange={updateSelectedRecord}
                 onSave={saveSelectedRecord}
                 saving={saving}
+                locationEditable={selectedRecord.mapSource === "saved"}
                 sourceName={
-                  selectedRecord.mapSource === "saved"
+                  selectedRecord.source === "manual"
+                    ? "Manual entry"
+                    : selectedRecord.mapSource === "saved"
                     ? "Saved record"
                     : undefined
                 }
                 saveLabel={
                   selectedRecord.mapSource === "saved"
                     ? "Save Changes"
+                    : selectedRecord.source === "manual"
+                    ? "Add Record"
                     : "Save Record"
                 }
               />

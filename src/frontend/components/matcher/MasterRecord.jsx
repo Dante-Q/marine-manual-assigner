@@ -11,7 +11,8 @@ function MasterRecord({
   saveLabel = "Save Record",
   recordLabel = "Master Record",
   recordLabelClassName = "",
-  sourceBadge
+  sourceBadge,
+  locationEditable = false
 }) {
   return (
     <section className="master-record">
@@ -59,9 +60,15 @@ function MasterRecord({
       </div>
 
       <LocationMap
+        key={record.id}
         latitude={record.latitude}
         longitude={record.longitude}
         name={record.name}
+        editable={locationEditable}
+        onCoordinatesChange={({ latitude, longitude }) => {
+          onChange("latitude", latitude);
+          onChange("longitude", longitude);
+        }}
       />
 
       <div className="master-record-form">

@@ -614,6 +614,39 @@ a:hover {
   white-space: nowrap;
 }
 
+.location-map-actions {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+}
+
+.location-map-move-toggle {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  color: var(--text-secondary);
+  font-size: 12px;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.location-map-move-toggle input {
+  margin: 0;
+  accent-color: var(--blue);
+}
+
+.location-map-editor .record-map-canvas,
+.location-map-editor .record-map-error {
+  height: 280px;
+  min-height: 280px;
+}
+
+.location-map-editor > p {
+  margin: 8px 0 0;
+  color: var(--text-muted);
+  font-size: 11px;
+}
+
 .location-map iframe {
   display: block;
   width: 100%;
@@ -779,6 +812,8 @@ a:hover {
 .record-map-header {
   display: flex;
   align-items: center;
+  justify-content: space-between;
+  gap: 16px;
   min-height: 54px;
   margin-bottom: 14px;
 }
@@ -955,6 +990,21 @@ a:hover {
 .record-map-legend-pin.saved,
 .record-map-pin.saved {
   background: #ec4899;
+}
+
+.record-map-pin.manual {
+  background: #1683ff;
+  width: 26px;
+  height: 26px;
+  box-shadow: 0 3px 9px rgba(22, 131, 255, 0.55);
+}
+
+.record-map-marker.leaflet-marker-draggable {
+  cursor: grab;
+}
+
+.record-map-marker.leaflet-drag-target {
+  cursor: grabbing;
 }
 
 .record-map-filter {
