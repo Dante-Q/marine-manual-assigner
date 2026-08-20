@@ -397,14 +397,6 @@ function Inspector({
                             )}
                       </span>
 
-                    </div>
-
-                    <div className="record-item-meta">
-
-                      <span>
-                        {formatLocation(record)}
-                      </span>
-
                       {showingSaved ? (
                         <span className="saved-badge">
                           {record.id}
@@ -416,6 +408,14 @@ function Inspector({
                           </span>
                         )
                       )}
+
+                    </div>
+
+                    <div className="record-item-meta">
+
+                      <span>
+                        {formatLocation(record)}
+                      </span>
 
                     </div>
 

@@ -1,0 +1,32 @@
+{
+  "id": "MARINA-00010",
+  "name": "Albert Edward Dock",
+  "type": null,
+  "description": null,
+  "latitude": 54.9959431,
+  "longitude": -1.4520154,
+  "address": {
+    "street": null,
+    "city": null,
+    "postcode": null,
+    "country": null
+  },
+  "phone": null,
+  "email": null,
+  "website": null,
+  "berths": null,
+  "facilities": [],
+  "images": [],
+  "sourceRecords": [
+    {
+      "id": "osm:way:30140028",
+      "source": "osm"
+    },
+    {
+      "id": "osm:node:332129744",
+      "source": "osm"
+    }
+  ],
+  "createdAt": "2026-08-17T15:23:21.265Z",
+  "updatedAt": "2026-08-17T15:23:21.265Z"
+}

@@ -1,0 +1,69 @@
+{
+  "id": "MARINA-00011",
+  "name": "Boatfolk Conwy Marina",
+  "type": "Marina",
+  "description": "With the mountains of Snowdonia National Park as a backdrop, Conwy Marina is an ideal base from which to explore the picturesque cruising grounds of the North Wales coast.",
+  "latitude": 53.291859,
+  "longitude": -3.840263,
+  "address": {
+    "street": "Boatfolk Conwy Marina, Conwy Marina",
+    "city": "Conwy",
+    "postcode": "LL32 8GU",
+    "country": " Wales, United Kingdom"
+  },
+  "phone": "+44 (0)1492 593000",
+  "email": "Conwy@boatfolk.co.uk",
+  "website": "https://www.boatfolk.co.uk/conwy-marina-wales",
+  "berths": 585,
+  "facilities": [
+    "Boat Care / Valeting",
+    "Boat Charter / Hire",
+    "Boat hoist / Lift out",
+    "Boat Sales / Broker",
+    "Boat storage",
+    "Boat yard",
+    "Café / Coffee Shop",
+    "Car Parking",
+    "Chandlery",
+    "Convenience Store",
+    "Customer Lounge",
+    "Electricity to Berths",
+    "Fuel Dock (Diesel)",
+    "Fuel Dock (Petrol)",
+    "Launderette",
+    "Marine Electronic Services",
+    "Marine engineering trades",
+    "Pump out",
+    "Restaurant / Bar",
+    "Rigging Services",
+    "Sail maker / Repairer",
+    "Slipway",
+    "Toilets & Showers (traditional style)",
+    "Tuition",
+    "Water to Berths",
+    "Wi-Fi"
+  ],
+  "images": [
+    "https://www.tyha.co.uk/GenerateImage.aspx?file=/images/galleries/gallery196/548_con marina 2.jpg&resize=T&keepRatio=T&maxWidth=600&maxHeight=600",
+    "https://www.tyha.co.uk/GenerateImage.aspx?file=/images/galleries/gallery196/549_conwy marina h leg.jpg&resize=T&keepRatio=T&maxWidth=600&maxHeight=600",
+    "https://www.tyha.co.uk/GenerateImage.aspx?file=/images/galleries/gallery196/872_a4901a_4cc9fa16bd234799a2764ee594c6c274-mv2_d_4928_3264_s_4_2.jpg&resize=T&keepRatio=T&maxWidth=600&maxHeight=600",
+    "https://www.tyha.co.uk/GenerateImage.aspx?file=/images/galleries/gallery196/873_NVW-C07-0708-03632.jpg&resize=T&keepRatio=T&maxWidth=600&maxHeight=600",
+    "https://www.tyha.co.uk/images/galleries/gallery196/548_con marina 2.jpg"
+  ],
+  "sourceRecords": [
+    {
+      "id": "tyha:192",
+      "source": "tyha"
+    },
+    {
+      "id": "marinas-com:3gc37g",
+      "source": "marinas-com"
+    },
+    {
+      "id": "osm:way:150361186",
+      "source": "osm"
+    }
+  ],
+  "createdAt": "2026-08-17T15:27:06.611Z",
+  "updatedAt": "2026-08-17T15:27:06.611Z"
+}

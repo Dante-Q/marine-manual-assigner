@@ -1,0 +1,28 @@
+{
+  "id": "MARINA-00014",
+  "name": "Pensarn Harbour",
+  "type": "Drying Mooring",
+  "description": null,
+  "latitude": 52.8294681,
+  "longitude": -4.1130053,
+  "address": {
+    "street": null,
+    "city": null,
+    "postcode": null,
+    "country": null
+  },
+  "phone": null,
+  "email": null,
+  "website": null,
+  "berths": null,
+  "facilities": [],
+  "images": [],
+  "sourceRecords": [
+    {
+      "id": "osm:way:386612919",
+      "source": "osm"
+    }
+  ],
+  "createdAt": "2026-08-17T15:56:56.322Z",
+  "updatedAt": "2026-08-17T15:57:21.827Z"
+}

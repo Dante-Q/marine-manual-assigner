@@ -1,0 +1,28 @@
+{
+  "id": "MARINA-00012",
+  "name": "North West Venturers Yacht Club",
+  "type": null,
+  "description": null,
+  "latitude": 53.2552025,
+  "longitude": -4.102511,
+  "address": {
+    "street": null,
+    "city": null,
+    "postcode": null,
+    "country": null
+  },
+  "phone": null,
+  "email": null,
+  "website": null,
+  "berths": null,
+  "facilities": [],
+  "images": [],
+  "sourceRecords": [
+    {
+      "id": "osm:way:1384311742",
+      "source": "osm"
+    }
+  ],
+  "createdAt": "2026-08-17T15:28:44.498Z",
+  "updatedAt": "2026-08-17T15:28:44.501Z"
+}

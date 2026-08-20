@@ -1,0 +1,32 @@
+{
+  "id": "MARINA-00013",
+  "name": "Port Dinorwic Marina",
+  "type": null,
+  "description": "Port Dinorwic Marina, Dinorwic, United Kingdom Marina. Find marina reviews, phone number, boat and yacht docks, slips, and moorings for rent at Port Dinorwic Marina.",
+  "latitude": "51.18651515092006",
+  "longitude": -4.210421519745012,
+  "address": {
+    "street": null,
+    "city": "Dinorwic",
+    "postcode": null,
+    "country": "GB"
+  },
+  "phone": "01248 671500/01248 670176",
+  "email": null,
+  "website": "https://dockwa.zendesk.com/hc/en-us/articles/13008712453271-Update-Your-Public-Profile-And-Manage-Settings-In-Dockwa-and-Marinas-com",
+  "berths": null,
+  "facilities": [],
+  "images": [
+    "https://img.marinas.com/v2/a8a5088101b3cc41498cf30afa691922094a2b3935cb0c0a85abdd11436711db.jpg",
+    "https://img.marinas.com/v2/cdf86a7333dab2a8be492be0815154ce2a741bff54eb81b759ed24f768604dde.jpg",
+    "https://img.marinas.com/v2/0476c9e64a3369dda9716f828686342edadce9ae436c75c9ac1f07920e934918.jpg"
+  ],
+  "sourceRecords": [
+    {
+      "id": "marinas-com:z4crmy3",
+      "source": "marinas-com"
+    }
+  ],
+  "createdAt": "2026-08-17T15:53:44.373Z",
+  "updatedAt": "2026-08-17T15:55:16.368Z"
+}
