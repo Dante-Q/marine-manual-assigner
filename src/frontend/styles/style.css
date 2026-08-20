@@ -1176,12 +1176,17 @@ a:hover {
 }
 
 .record-map-match-tabs {
+  position: sticky;
+  top: -28px;
+  z-index: 500;
   display: flex;
   gap: 6px;
   margin-bottom: 14px;
-  padding-bottom: 8px;
+  padding: 8px 0;
+  background: var(--bg);
   border-bottom: 1px solid var(--border);
   overflow-x: auto;
+  box-shadow: 0 5px 10px rgba(5, 10, 18, 0.18);
 }
 
 .record-map-match-tabs button {
@@ -1873,6 +1878,10 @@ a:hover {
     height: auto;
     min-height: calc(100vh - var(--topbar-height));
     padding: 18px;
+  }
+
+  .record-map-match-tabs {
+    top: -18px;
   }
 
   .record-map-canvas,

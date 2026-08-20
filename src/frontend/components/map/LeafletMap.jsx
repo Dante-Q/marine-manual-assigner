@@ -78,8 +78,21 @@ function LeafletMap({
   const markerLayerRef = useRef(null);
   const leafletRef = useRef(null);
   const hasInitializedViewRef = useRef(false);
+  const handlersRef = useRef({});
   const [ready, setReady] = useState(false);
   const [error, setError] = useState(null);
+
+  handlersRef.current = {
+    onSelectRecord,
+    onAddSourceRecord,
+    onEditRawRecord,
+    onDeleteRawRecord,
+    onToggleRawRecordHidden,
+    onRecordMove
+  };
+
+  const sourceRecordIdsKey = sourceRecordIds.join("\u0000");
+  const canAddSourceRecords = Boolean(onAddSourceRecord);
 
   useEffect(() => {
     let cancelled = false;
@@ -184,14 +197,14 @@ function LeafletMap({
       if (record.id === draggableRecordId) {
         marker.on("dragend", event => {
           const position = event.target.getLatLng();
-          onRecordMove?.({
+          handlersRef.current.onRecordMove?.({
             latitude: Number(position.lat.toFixed(6)),
             longitude: Number(position.lng.toFixed(6))
           });
         });
       }
       const canAddAsSource =
-        Boolean(onAddSourceRecord) &&
+        canAddSourceRecords &&
         record.mapSource !== "saved" &&
         record.id !== masterRecordId &&
         !sourceRecordIds.includes(record.id);
@@ -212,7 +225,7 @@ function LeafletMap({
         editButton?.addEventListener("click", clickEvent => {
           clickEvent.preventDefault();
           clickEvent.stopPropagation();
-          onSelectRecord?.(record);
+          handlersRef.current.onSelectRecord?.(record);
         });
 
         const addSourceButton =
@@ -223,7 +236,7 @@ function LeafletMap({
         addSourceButton?.addEventListener("click", clickEvent => {
           clickEvent.preventDefault();
           clickEvent.stopPropagation();
-          onAddSourceRecord?.(record);
+          handlersRef.current.onAddSourceRecord?.(record);
         });
 
         const editRawButton =
@@ -234,7 +247,7 @@ function LeafletMap({
         editRawButton?.addEventListener("click", clickEvent => {
           clickEvent.preventDefault();
           clickEvent.stopPropagation();
-          onEditRawRecord?.(record);
+          handlersRef.current.onEditRawRecord?.(record);
         });
 
         const deleteRawButton =
@@ -245,7 +258,7 @@ function LeafletMap({
         deleteRawButton?.addEventListener("click", clickEvent => {
           clickEvent.preventDefault();
           clickEvent.stopPropagation();
-          onDeleteRawRecord?.(record);
+          handlersRef.current.onDeleteRawRecord?.(record);
         });
 
         const toggleHiddenButton =
@@ -256,7 +269,7 @@ function LeafletMap({
         toggleHiddenButton?.addEventListener("click", clickEvent => {
           clickEvent.preventDefault();
           clickEvent.stopPropagation();
-          onToggleRawRecordHidden?.(record);
+          handlersRef.current.onToggleRawRecordHidden?.(record);
         });
       });
       marker.addTo(markers);
@@ -278,15 +291,10 @@ function LeafletMap({
   }, [
     records,
     ready,
-    onSelectRecord,
-    onAddSourceRecord,
-    onEditRawRecord,
-    onDeleteRawRecord,
-    onToggleRawRecordHidden,
+    canAddSourceRecords,
     masterRecordId,
-    sourceRecordIds,
-    draggableRecordId,
-    onRecordMove
+    sourceRecordIdsKey,
+    draggableRecordId
   ]);
 
   useEffect(() => {
