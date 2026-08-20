@@ -17,7 +17,8 @@ function Matcher({
   records,
   savedRecords,
   setSavedRecords,
-  initialMasterRecord
+  initialMasterRecord,
+  serviceOptions
 }) {
   const [masterRecord, setMasterRecord] =
     useState(
@@ -395,6 +396,7 @@ async function handleSave() {
         onSave={handleSave}
         saving={saving}
         locationEditable
+        serviceOptions={serviceOptions}
       />
 
       <section className="source-records-section">

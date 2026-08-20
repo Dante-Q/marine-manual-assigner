@@ -12,7 +12,8 @@ function MasterRecord({
   recordLabel = "Master Record",
   recordLabelClassName = "",
   sourceBadge,
-  locationEditable = false
+  locationEditable = false,
+  serviceOptions = []
 }) {
   return (
     <section className="master-record">
@@ -155,6 +156,7 @@ function MasterRecord({
 
         <FacilitiesField
           facilities={record.facilities}
+          options={serviceOptions}
           onChange={facilities =>
             onChange("facilities", facilities)
           }
@@ -244,10 +246,20 @@ function EditableField({
 
 function FacilitiesField({
   facilities,
+  options,
   onChange
 }) {
   const [inputValue, setInputValue] = useState("");
+  const [showOptions, setShowOptions] = useState(false);
   const values = normalizeFacilities(facilities);
+  const selectedKeys = new Set(
+    values.map(service => service.toLowerCase())
+  );
+  const query = inputValue.trim().toLowerCase();
+  const availableOptions = options.filter(service =>
+    !selectedKeys.has(service.toLowerCase()) &&
+    (!query || service.toLowerCase().includes(query))
+  );
 
   function addFacilities(value) {
     const additions = normalizeFacilities(value);
@@ -288,19 +300,19 @@ function FacilitiesField({
 
   return (
     <div className="master-record-field facilities-field">
-      <label htmlFor="facilities-input">
-        Facilities
+      <label htmlFor="services-input">
+        Services
       </label>
 
       <div className="facility-input">
-        {values.map(facility => (
-          <span className="facility-badge" key={facility}>
-            {facility}
+        {values.map(service => (
+          <span className="facility-badge" key={service}>
+            {service}
 
             <button
               type="button"
-              onClick={() => removeFacility(facility)}
-              aria-label={`Remove ${facility}`}
+              onClick={() => removeFacility(service)}
+              aria-label={`Remove ${service}`}
             >
               ×
             </button>
@@ -308,14 +320,11 @@ function FacilitiesField({
         ))}
 
         <input
-          id="facilities-input"
+          id="services-input"
           type="text"
           value={inputValue}
-          placeholder={
-            values.length === 0
-              ? "Type a facility, then press Enter"
-              : "Add another facility"
-          }
+          placeholder="+ Add new service type"
+          onFocus={() => setShowOptions(true)}
           onChange={event =>
             setInputValue(event.target.value)
           }
@@ -328,7 +337,10 @@ function FacilitiesField({
               addFacilities(inputValue);
             }
           }}
-          onBlur={() => addFacilities(inputValue)}
+          onBlur={() => {
+            addFacilities(inputValue);
+            setShowOptions(false);
+          }}
           onPaste={event => {
             const pasted =
               event.clipboardData.getData("text");
@@ -341,8 +353,24 @@ function FacilitiesField({
         />
       </div>
 
+      {showOptions && availableOptions.length > 0 && (
+        <div className="service-options-dropdown">
+          {availableOptions.map(service => (
+            <button
+              type="button"
+              className="facility-badge"
+              key={service}
+              onMouseDown={event => event.preventDefault()}
+              onClick={() => addFacilities(service)}
+            >
+              + {service}
+            </button>
+          ))}
+        </div>
+      )}
+
       <span className="facility-help">
-        Press Enter or comma to add a facility.
+        Choose a previous service or press Enter to add a new type.
       </span>
     </div>
   );

@@ -670,7 +670,22 @@ a:hover {
 }
 
 .source-record > .location-map {
-  margin: 0 20px 16px;
+  margin: 20px 24px;
+}
+
+.source-record-form input[readonly],
+.source-record-form textarea[readonly] {
+  cursor: default;
+}
+
+.source-facilities {
+  cursor: default;
+}
+
+.source-empty-value {
+  padding: 4px;
+  color: var(--text-muted);
+  font-size: 12px;
 }
 
 /* =========================================================
@@ -1085,6 +1100,25 @@ a:hover {
   height: 100%;
   min-height: 420px;
   background: var(--bg-secondary);
+}
+
+.record-map-frame .record-map-canvas::after {
+  position: absolute;
+  right: 10px;
+  bottom: 10px;
+  z-index: 500;
+  padding: 5px 8px;
+  background: rgba(8, 14, 25, 0.82);
+  border: 1px solid var(--border-light);
+  border-radius: 4px;
+  color: var(--text-secondary);
+  font-size: 10px;
+  pointer-events: none;
+  content: "Click map to enable scroll zoom";
+}
+
+.record-map-frame .record-map-canvas.scroll-zoom-active::after {
+  content: "Scroll zoom enabled";
 }
 
 .record-map-marker {
@@ -2294,6 +2328,30 @@ a:hover {
 .facility-input:focus-within {
   border-color: var(--blue);
   box-shadow: 0 0 0 2px rgba(22, 131, 255, 0.14);
+}
+
+.service-options-dropdown {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 7px;
+  max-height: 170px;
+  margin-top: 6px;
+  padding: 10px;
+  overflow-y: auto;
+  background: var(--bg-secondary);
+  border: 1px solid var(--border-light);
+  border-radius: var(--radius-small);
+  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.24);
+}
+
+.service-options-dropdown .facility-badge {
+  cursor: pointer;
+}
+
+.service-options-dropdown .facility-badge:hover {
+  background: rgba(22, 131, 255, 0.28);
+  border-color: rgba(22, 131, 255, 0.55);
+  color: white;
 }
 
 .facility-input input {

@@ -8,7 +8,8 @@ function Inspector({
   records,
   savedRecords,
   setSavedRecords,
-  onCreateMaster
+  onCreateMaster,
+  serviceOptions
 }) {
   const [selectedSource, setSelectedSource] =
     useState("all");
@@ -469,6 +470,7 @@ function Inspector({
                 <SavedRecordDetail
                   record={selectedRecord}
                   setSavedRecords={setSavedRecords}
+                  serviceOptions={serviceOptions}
                 />
               ) : (
                 <RecordDetail
@@ -642,7 +644,7 @@ function RecordDetail({
         />
 
         <DetailField
-          label="Facilities"
+          label="Services"
           value={formatJsonValue(
             record.facilities
           )}
@@ -693,7 +695,8 @@ function RecordDetail({
 
 function SavedRecordDetail({
   record,
-  setSavedRecords
+  setSavedRecords,
+  serviceOptions
 }) {
   const [editing, setEditing] = useState(false);
   const [draft, setDraft] = useState(record);
@@ -771,6 +774,7 @@ function SavedRecordDetail({
           onSave={saveChanges}
           saving={saving}
           locationEditable
+          serviceOptions={serviceOptions}
           sourceName="Saved record"
           recordLabel="Saved Record"
           saveLabel="Save Changes"
@@ -879,7 +883,7 @@ function SavedRecordDetail({
         />
 
         <DetailField
-          label="Facilities"
+          label="Services"
           value={formatJsonValue(
             record.facilities
           )}

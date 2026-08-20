@@ -1,42 +1,24 @@
 import LocationMap from "../LocationMap.jsx";
 
-function SourceRecord({
-  record,
-  onRemove
-}) {
+function SourceRecord({ record, onRemove }) {
   return (
-    <article className="source-record">
-
-      <div className="source-record-header">
-
+    <article className="master-record source-record">
+      <div className="master-record-header">
         <div>
-          <span className="source-label">
-            {getSourceName(record.source)}
-          </span>
-
-          <h3>
-            {record.name ||
-              "Unnamed marina"}
-          </h3>
+          <div className="master-record-badges">
+            <span className="master-record-label">Source Record</span>
+            <span className="source-label">{getSourceName(record.source)}</span>
+          </div>
+          <h2>{record.name || "Unnamed marina"}</h2>
+          <p>Read-only data from the original source record.</p>
         </div>
 
         <button
-          className="remove-record-button"
-          onClick={() =>
-            onRemove(record.id)
-          }
-          aria-label={`Remove ${
-            record.name ||
-            "source record"
-          }`}
+          className="secondary-button"
+          onClick={() => onRemove(record.id)}
         >
-          ×
+          Remove Source
         </button>
-
-      </div>
-
-      <div className="source-record-location">
-        {formatLocation(record)}
       </div>
 
       <LocationMap
@@ -45,203 +27,130 @@ function SourceRecord({
         name={record.name}
       />
 
-      <div className="source-record-grid">
+      <div className="master-record-form source-record-form">
+        <ReadOnlyField label="Name" value={record.name} />
+        <ReadOnlyField label="Type" value={record.type} />
+        <ReadOnlyField label="Description" value={record.description} textarea />
+        <ReadOnlyField label="Latitude" value={record.latitude} />
+        <ReadOnlyField label="Longitude" value={record.longitude} />
+        <ReadOnlyAddress address={record.address} />
+        <ReadOnlyField label="Phone" value={record.phone} />
+        <ReadOnlyField label="Email" value={record.email} />
+        <ReadOnlyField label="Website" value={record.website} />
+        <ReadOnlyField label="Berths" value={record.berths} />
+        <ReadOnlyServices facilities={record.facilities} />
+      </div>
 
-        <DetailField
-          label="ID"
-          value={record.id}
-        />
-
-        <DetailField
-          label="Source"
-          value={getSourceName(record.source)}
-        />
-
-        <DetailField
-          label="Description"
-          value={record.description}
-        />
-
-        <DetailField
-          label="Coordinates"
-          value={formatCoordinates(
-            record.latitude,
-            record.longitude
-          )}
-        />
-
-        <DetailField
-          label="Address"
-          value={formatAddress(record.address)}
-        />
-
-        <DetailField
-          label="Phone"
-          value={record.phone}
-        />
-
-        <DetailField
-          label="Email"
-          value={record.email}
-        />
-
-        <DetailField
-          label="Website"
-          value={record.website}
-          link
-        />
-
-        <DetailField
-          label="Berths"
-          value={record.berths}
-        />
-
-        <DetailField
-          label="Source File"
-          value={record.sourceFile}
-        />
-
+      <div className="master-record-source">
+        <div>
+          <span className="field-label">Original Source</span>
+          <strong>{getSourceName(record.source)}</strong>
+        </div>
+        <div>
+          <span className="field-label">Source Record ID</span>
+          <strong>{record.id}</strong>
+        </div>
+        <div>
+          <span className="field-label">Source File</span>
+          <strong>{record.sourceFile || "Not available"}</strong>
+        </div>
       </div>
 
       <details className="source-record-raw">
-
-        <summary>
-          Complete Source Record
-        </summary>
-
-        <pre>
-          {JSON.stringify(
-            record,
-            null,
-            2
-          )}
-        </pre>
-
+        <summary>Complete Source Record</summary>
+        <pre>{JSON.stringify(record, null, 2)}</pre>
       </details>
-
     </article>
   );
 }
 
-function DetailField({
-  label,
-  value,
-  link = false
-}) {
-  if (
-    value === null ||
-    value === undefined ||
-    value === ""
-  ) {
-    return (
-      <div className="source-record-field">
-
-        <label>
-          {label}
-        </label>
-
-        <div className="muted">
-          Not available
-        </div>
-
-      </div>
-    );
-  }
+function ReadOnlyField({ label, value, textarea = false }) {
+  const displayValue = value === null || value === undefined ? "" : String(value);
 
   return (
-    <div className="source-record-field">
-
-      <label>
-        {label}
-      </label>
-
-      <div>
-        {link ? (
-          <a
-            href={value}
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            {value}
-          </a>
-        ) : (
-          String(value)
-        )}
-      </div>
-
+    <div className="master-record-field">
+      <label>{label}</label>
+      {textarea ? (
+        <textarea value={displayValue} rows={4} readOnly />
+      ) : (
+        <input type="text" value={displayValue} readOnly />
+      )}
     </div>
   );
 }
 
-function formatLocation(record) {
-  const address =
-    formatAddress(record.address);
+function ReadOnlyAddress({ address }) {
+  const normalized = normalizeAddress(address);
 
-  if (address) {
-    return address;
-  }
-
-  if (
-    record.latitude !== null &&
-    record.latitude !== undefined &&
-    record.longitude !== null &&
-    record.longitude !== undefined
-  ) {
-    return `${record.latitude}, ${record.longitude}`;
-  }
-
-  return "Location unavailable";
+  return (
+    <div className="master-record-field address-fields">
+      <label>Address</label>
+      <div className="address-field-grid">
+        <ReadOnlyAddressInput label="Street" value={normalized.street} />
+        <ReadOnlyAddressInput label="City" value={normalized.city} />
+        <ReadOnlyAddressInput label="Postcode" value={normalized.postcode} />
+        <ReadOnlyAddressInput label="Country" value={normalized.country} />
+      </div>
+      <span className="facility-help">Original structured address.</span>
+    </div>
+  );
 }
 
-function formatCoordinates(
-  latitude,
-  longitude
-) {
-  if (
-    latitude === null ||
-    latitude === undefined ||
-    longitude === null ||
-    longitude === undefined
-  ) {
-    return null;
-  }
-
-  return `${latitude}, ${longitude}`;
+function ReadOnlyAddressInput({ label, value }) {
+  return (
+    <label className="address-input">
+      <span>{label}</span>
+      <input type="text" value={value ?? ""} readOnly />
+    </label>
+  );
 }
 
-function formatAddress(address) {
-  if (!address) {
-    return null;
-  }
+function ReadOnlyServices({ facilities }) {
+  const values = Array.isArray(facilities) ? facilities.filter(Boolean) : [];
 
-  if (typeof address === "string") {
-    return address;
-  }
+  return (
+    <div className="master-record-field facilities-field">
+      <label>Services</label>
+      <div className="facility-input source-facilities">
+        {values.length > 0 ? values.map(facility => (
+          <span className="facility-badge" key={facility}>{facility}</span>
+        )) : (
+          <span className="source-empty-value">No services listed</span>
+        )}
+      </div>
+      <span className="facility-help">Services from the original source.</span>
+    </div>
+  );
+}
+
+function normalizeAddress(address) {
+  const emptyAddress = {
+    street: null,
+    city: null,
+    postcode: null,
+    country: null
+  };
 
   if (Array.isArray(address)) {
-    return (
-      address
-        .filter(Boolean)
-        .join(", ") ||
-      null
-    );
+    return {
+      ...emptyAddress,
+      street: address.filter(Boolean).join(", ") || null
+    };
   }
 
-  if (typeof address === "object") {
-    return (
-      Object.values(address)
-        .filter(
-          value =>
-            value !== null &&
-            value !== undefined &&
-            value !== ""
-        )
-        .join(", ") ||
-      null
-    );
+  if (typeof address === "object" && address) {
+    return {
+      ...emptyAddress,
+      street: address.street ?? null,
+      city: address.city ?? null,
+      postcode: address.postcode ?? null,
+      country: address.country ?? null
+    };
   }
 
-  return null;
+  return address
+    ? { ...emptyAddress, street: String(address) }
+    : emptyAddress;
 }
 
 function getSourceName(source) {

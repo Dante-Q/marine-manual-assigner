@@ -1,0 +1,39 @@
+{
+  "id": "MARINA-00016",
+  "name": "The Lagoon",
+  "type": null,
+  "description": null,
+  "latitude": 52.2523779,
+  "longitude": -6.3487298,
+  "address": {
+    "street": null,
+    "city": null,
+    "postcode": null,
+    "country": "IE"
+  },
+  "phone": null,
+  "email": null,
+  "website": null,
+  "berths": null,
+  "facilities": [
+    "Camping Gaz",
+    "hello"
+  ],
+  "images": [],
+  "sourceRecords": [
+    {
+      "id": "osm-IE:node:685988205",
+      "source": "osm-IE"
+    },
+    {
+      "id": "osm-IE:way:149822350",
+      "source": "osm-IE"
+    },
+    {
+      "id": "osm-IE:node:313217772",
+      "source": "osm-IE"
+    }
+  ],
+  "createdAt": "2026-08-20T19:48:14.457Z",
+  "updatedAt": "2026-08-20T19:48:14.457Z"
+}

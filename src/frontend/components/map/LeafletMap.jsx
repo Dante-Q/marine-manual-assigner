@@ -71,7 +71,9 @@ function LeafletMap({
   focusToken,
   focusZoom = false,
   draggableRecordId,
-  onRecordMove
+  onRecordMove,
+  scrollWheelZoom = true,
+  clickToEnableScrollZoom = false
 }) {
   const containerRef = useRef(null);
   const mapRef = useRef(null);
@@ -104,8 +106,22 @@ function LeafletMap({
         }
 
         const map = L.map(containerRef.current, {
-          scrollWheelZoom: true
+          scrollWheelZoom: clickToEnableScrollZoom ? false : scrollWheelZoom
         });
+
+        if (clickToEnableScrollZoom) {
+          const container = map.getContainer();
+
+          map.on("click", () => {
+            map.scrollWheelZoom.enable();
+            container.classList.add("scroll-zoom-active");
+          });
+
+          container.addEventListener("mouseleave", () => {
+            map.scrollWheelZoom.disable();
+            container.classList.remove("scroll-zoom-active");
+          });
+        }
 
         if (initialView) {
           map.setView(
@@ -373,7 +389,7 @@ function createPopup(record, canAddAsSource, isRawRecord) {
       ${address ? `<p>${address}</p>` : ""}
       <div class="record-map-popup-actions">
         <button type="button" class="record-map-edit-button">
-          Edit record
+          ${isRawRecord ? "Add master record" : "Edit saved record"}
         </button>
         ${canAddAsSource ? `
           <button type="button" class="record-map-add-source-button">

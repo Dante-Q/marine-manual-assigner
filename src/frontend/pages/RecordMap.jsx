@@ -41,7 +41,8 @@ function RecordMap({
   savedRecords,
   setSavedRecords,
   mapView,
-  onMapViewChange
+  onMapViewChange,
+  serviceOptions
 }) {
   const [selectedSources, setSelectedSources] = useState(() => new Set(["saved"]));
   const [selectedRecord, setSelectedRecord] = useState(null);
@@ -574,6 +575,7 @@ function RecordMap({
               : undefined
           }
           onRecordMove={handleManualPinMove}
+          clickToEnableScrollZoom
         />
       </div>
 
@@ -662,6 +664,7 @@ function RecordMap({
                 onSave={saveSelectedRecord}
                 saving={saving}
                 locationEditable
+                serviceOptions={serviceOptions}
                 sourceName={
                   selectedRecord.source === "manual"
                     ? "Manual entry"
@@ -731,6 +734,7 @@ function RecordMap({
             recordLabel="Raw Record"
             recordLabelClassName="raw-record-label"
             sourceBadge={getRawSourceLabel(rawDraft.source)}
+            serviceOptions={serviceOptions}
           />
         </section>
       )}

@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 
 import {
   fetchRecords,
@@ -28,6 +28,21 @@ function App() {
 
   const [error, setError] =
     useState(null);
+
+  const serviceOptions = useMemo(() => {
+    const values = new Map();
+
+    for (const record of [...records, ...savedRecords]) {
+      for (const service of record.facilities ?? []) {
+        const value = String(service).trim();
+        if (value) values.set(value.toLowerCase(), value);
+      }
+    }
+
+    return [...values.values()].sort((left, right) =>
+      left.localeCompare(right)
+    );
+  }, [records, savedRecords]);
 
   useEffect(() => {
     async function loadApplicationData() {
@@ -147,6 +162,7 @@ function App() {
             records={records}
             savedRecords={savedRecords}
             setSavedRecords={setSavedRecords}
+            serviceOptions={serviceOptions}
             onCreateMaster={record => {
               setInitialMasterRecord(record);
               setPage("matcher");
@@ -160,6 +176,7 @@ function App() {
             savedRecords={savedRecords}
             setSavedRecords={setSavedRecords}
             initialMasterRecord={initialMasterRecord}
+            serviceOptions={serviceOptions}
           />
         )}
 
@@ -171,6 +188,7 @@ function App() {
             setSavedRecords={setSavedRecords}
             mapView={recordMapView}
             onMapViewChange={setRecordMapView}
+            serviceOptions={serviceOptions}
           />
         )}
 
