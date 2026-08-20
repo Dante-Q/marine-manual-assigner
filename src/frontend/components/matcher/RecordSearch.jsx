@@ -181,7 +181,10 @@ function getSourceName(source) {
   const names = {
     tyha: "TYHA",
     "marinas-com": "Marinas.com",
-    osm: "OpenStreetMap"
+    osm: "OpenStreetMap",
+    "tyha-IE": "TYHA-IE",
+    "marinas-com-IE": "Marinas.com-IE",
+    "osm-IE": "OpenStreetMap-IE"
   };
 
   return names[source] ?? source;

@@ -35,6 +35,18 @@ function Inspector({
           record.source === "marinas-com"
       ).length,
 
+      "tyha-IE": records.filter(
+        record => record.source === "tyha-IE"
+      ).length,
+
+      "marinas-com-IE": records.filter(
+        record => record.source === "marinas-com-IE"
+      ).length,
+
+      "osm-IE": records.filter(
+        record => record.source === "osm-IE"
+      ).length,
+
       osm: records.filter(
         record => record.source === "osm"
       ).length,
@@ -252,6 +264,30 @@ function Inspector({
             source="osm"
             label="OSM"
             count={counts.osm}
+            selected={selectedSource}
+            onClick={handleSourceChange}
+          />
+
+          <SourceButton
+            source="tyha-IE"
+            label="TYHA-IE"
+            count={counts["tyha-IE"]}
+            selected={selectedSource}
+            onClick={handleSourceChange}
+          />
+
+          <SourceButton
+            source="marinas-com-IE"
+            label="Marinas.com-IE"
+            count={counts["marinas-com-IE"]}
+            selected={selectedSource}
+            onClick={handleSourceChange}
+          />
+
+          <SourceButton
+            source="osm-IE"
+            label="OSM-IE"
+            count={counts["osm-IE"]}
             selected={selectedSource}
             onClick={handleSourceChange}
           />
@@ -1083,6 +1119,9 @@ function getSourceName(source) {
     tyha: "TYHA",
     "marinas-com": "Marinas.com",
     osm: "OpenStreetMap",
+    "tyha-IE": "TYHA-IE",
+    "marinas-com-IE": "Marinas.com-IE",
+    "osm-IE": "OpenStreetMap-IE",
     saved: "Saved Records"
   };
 

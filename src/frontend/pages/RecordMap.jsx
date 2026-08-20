@@ -47,6 +47,11 @@ function RecordMap({
       record => record.source === "marinas-com"
     ).length,
     osm: records.filter(record => record.source === "osm").length,
+    "tyha-IE": records.filter(record => record.source === "tyha-IE").length,
+    "marinas-com-IE": records.filter(
+      record => record.source === "marinas-com-IE"
+    ).length,
+    "osm-IE": records.filter(record => record.source === "osm-IE").length,
     saved: savedRecords.length
   }), [records, savedRecords]);
 
@@ -410,6 +415,27 @@ function RecordMap({
           onSelect={handleSourceChange}
         />
         <SourceFilter
+          source="tyha-IE"
+          label="TYHA-IE"
+          count={counts["tyha-IE"]}
+          selectedSource={selectedSource}
+          onSelect={handleSourceChange}
+        />
+        <SourceFilter
+          source="marinas-com-IE"
+          label="Marinas.com-IE"
+          count={counts["marinas-com-IE"]}
+          selectedSource={selectedSource}
+          onSelect={handleSourceChange}
+        />
+        <SourceFilter
+          source="osm-IE"
+          label="OSM-IE"
+          count={counts["osm-IE"]}
+          selectedSource={selectedSource}
+          onSelect={handleSourceChange}
+        />
+        <SourceFilter
           source="saved"
           label="Saved Records"
           count={counts.saved}
@@ -423,6 +449,9 @@ function RecordMap({
           <LegendItem source="tyha" label="TYHA" />
           <LegendItem source="marinas-com" label="Marinas.com" />
           <LegendItem source="osm" label="OpenStreetMap" />
+          <LegendItem source="tyha-IE" label="TYHA-IE" />
+          <LegendItem source="marinas-com-IE" label="Marinas.com-IE" />
+          <LegendItem source="osm-IE" label="OpenStreetMap-IE" />
           <LegendItem source="saved" label="Saved Record" />
         </div>
 
@@ -687,7 +716,10 @@ function getRawSourceLabel(source) {
   const labels = {
     tyha: "TYHA",
     "marinas-com": "Marinas.com",
-    osm: "OSM"
+    osm: "OSM",
+    "tyha-IE": "TYHA-IE",
+    "marinas-com-IE": "Marinas.com-IE",
+    "osm-IE": "OSM-IE"
   };
 
   return labels[source] ?? source;
@@ -698,6 +730,9 @@ function getMapSourceName(source) {
     tyha: "TYHA",
     "marinas-com": "Marinas.com",
     osm: "OSM",
+    "tyha-IE": "TYHA-IE",
+    "marinas-com-IE": "Marinas.com-IE",
+    "osm-IE": "OSM-IE",
     saved: "Saved"
   };
 

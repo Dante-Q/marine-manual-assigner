@@ -987,6 +987,21 @@ a:hover {
   background: #a855f7;
 }
 
+.record-map-legend-pin.tyha-IE,
+.record-map-pin.tyha-IE {
+  background: #14b8a6;
+}
+
+.record-map-legend-pin.marinas-com-IE,
+.record-map-pin.marinas-com-IE {
+  background: #f97316;
+}
+
+.record-map-legend-pin.osm-IE,
+.record-map-pin.osm-IE {
+  background: #6366f1;
+}
+
 .record-map-legend-pin.saved,
 .record-map-pin.saved {
   background: #ec4899;

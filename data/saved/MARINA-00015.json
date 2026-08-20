@@ -1,0 +1,40 @@
+{
+  "id": "MARINA-00015",
+  "name": "Dun Laoghaire Marina",
+  "type": "Marina",
+  "description": "The marina is located in the historic harbour of Dun Laoghaire on the southern shore of Dublin Bay. The harbour was completed in 1859 and was originally intended as a harbour of refuge. Dun Laoghaire Marina itself opened for business on St Patricks Day, 17th March, in 2001. Since then the marina has grown in success and now has capacity for 820 boats. The marina can be accessed 24 hours by boats of up to 4m draft. We have berths to suit boats from 6m to 46m in length with a maximum displacement weight of 240 tonnes.\n",
+  "latitude": 53.2975647,
+  "longitude": -6.1368705,
+  "address": {
+    "street": "Harbour Road",
+    "city": "Dún Laoghaire",
+    "postcode": "A96 D376",
+    "country": "IE"
+  },
+  "phone": "+353 (1) 202 0040",
+  "email": "info@dlmarina.com",
+  "website": "https://www.dlmarina.com/",
+  "berths": "820",
+  "facilities": [
+    "Petrol/Diesel",
+    "Electricity",
+    "Camping Gaz"
+  ],
+  "images": [],
+  "sourceRecords": [
+    {
+      "id": "osm-IE:node:1031044077",
+      "source": "osm-IE"
+    },
+    {
+      "id": "tyha-IE:83",
+      "source": "tyha-IE"
+    },
+    {
+      "id": "marinas-com-IE:lwcxjy",
+      "source": "marinas-com-IE"
+    }
+  ],
+  "createdAt": "2026-08-20T19:02:35.255Z",
+  "updatedAt": "2026-08-20T19:02:35.255Z"
+}

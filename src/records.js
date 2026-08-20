@@ -123,6 +123,7 @@ export function loadRecords() {
 
   const marinasComDir = path.join(
     DATA_DIR,
+    "GB",
     "marinas-com"
   );
 
@@ -192,6 +193,68 @@ export function loadRecords() {
         data.source?.url ??
         null,
 
+      raw: data
+    });
+  }
+
+  // ------------------------------------------------------------
+  // Ireland sources
+  //
+  // Keep these as distinct sources so records with the same
+  // provider ID in GB and IE cannot collide in the viewer.
+  // ------------------------------------------------------------
+
+  const ieTyhaDir = path.join(DATA_DIR, "IE", "tyha", "marinas");
+
+  for (const record of readJsonFiles(ieTyhaDir)) {
+    const data = record.data;
+
+    records.push({
+      id: `tyha-IE:${data.identity?.id ?? record.file}`,
+      source: "tyha-IE",
+      sourceFile: record.file,
+      name: data.identity?.name ?? null,
+      description: data.overview?.description ?? null,
+      latitude: data.location?.latitude ?? data.discovery?.latitude ?? null,
+      longitude: data.location?.longitude ?? data.discovery?.longitude ?? null,
+      address: data.address ?? [],
+      phone: data.contact?.phone ?? null,
+      email: data.contact?.email ?? null,
+      website: data.contact?.website ?? null,
+      berths: data.overview?.berths ?? null,
+      facilities: data.facilities ?? [],
+      images: data.images ?? [],
+      sourceUrl: data.source?.url ?? null,
+      raw: data
+    });
+  }
+
+  const ieMarinasComDir = path.join(DATA_DIR, "IE", "marinas-com");
+
+  for (const record of readJsonFiles(ieMarinasComDir)) {
+    const data = record.data;
+    const marina = data.marina;
+
+    if (!marina) {
+      continue;
+    }
+
+    records.push({
+      id: `marinas-com-IE:${marina.sourceRecord?.marinasComId ?? record.file}`,
+      source: "marinas-com-IE",
+      sourceFile: record.file,
+      name: marina.name ?? null,
+      description: marina.description ?? null,
+      latitude: marina.coordinates?.latitude ?? null,
+      longitude: marina.coordinates?.longitude ?? null,
+      address: marina.address ?? {},
+      phone: marina.contact?.phone ?? null,
+      email: marina.contact?.email ?? null,
+      website: marina.contact?.website ?? null,
+      berths: marina.berthCapacity ?? null,
+      facilities: [],
+      images: marina.images ?? [],
+      sourceUrl: marina.sourceUrl ?? data.source?.url ?? null,
       raw: data
     });
   }
@@ -311,22 +374,68 @@ export function loadRecords() {
     }
   }
 
+  const ieOsmFile = path.join(
+    DATA_DIR,
+    "IE",
+    "sailingworldmap",
+    "ie-marinas.json"
+  );
+
+  if (fs.existsSync(ieOsmFile)) {
+    try {
+      const data = readJsonFile(ieOsmFile);
+
+      for (const element of data?.data?.elements ?? []) {
+        const tags = element.tags ?? {};
+
+        records.push({
+          id: `osm-IE:${element.type}:${element.id}`,
+          source: "osm-IE",
+          sourceFile: "ie-marinas.json",
+          name: tags.name ?? null,
+          description: null,
+          latitude: element.lat ?? element.center?.lat ?? null,
+          longitude: element.lon ?? element.center?.lon ?? null,
+          address: {
+            street: tags["addr:street"] ?? null,
+            city: tags["addr:city"] ?? null,
+            postcode: tags["addr:postcode"] ?? null,
+            country: tags["addr:country"] ?? "IE"
+          },
+          phone: tags.phone ?? tags["contact:phone"] ?? null,
+          email: tags.email ?? tags["contact:email"] ?? null,
+          website: tags.website ?? tags["contact:website"] ?? null,
+          berths: null,
+          facilities: [],
+          images: tags.image ? [tags.image] : [],
+          sourceUrl: null,
+          raw: element
+        });
+      }
+    } catch (error) {
+      console.error(`Failed to read ${ieOsmFile}:`, error.message);
+    }
+  }
+
   return records;
 }
 
 export function updateRawRecord(id, updates) {
   const record = findRawRecord(id);
 
-  if (record.source === "osm") {
+  if (record.source === "osm" || record.source === "osm-IE") {
     return updateOsmRecord(record, updates);
   }
 
   const filePath = getRawFilePath(record);
   const data = readJsonFile(filePath);
 
-  if (record.source === "tyha") {
+  if (record.source === "tyha" || record.source === "tyha-IE") {
     updateTyhaRecord(data, updates);
-  } else if (record.source === "marinas-com") {
+  } else if (
+    record.source === "marinas-com" ||
+    record.source === "marinas-com-IE"
+  ) {
     updateMarinasComRecord(data, updates);
   } else {
     throw new Error(`Unsupported raw source: ${record.source}`);
@@ -339,12 +448,12 @@ export function updateRawRecord(id, updates) {
 export function deleteRawRecord(id) {
   const record = findRawRecord(id);
 
-  if (record.source === "osm") {
+  if (record.source === "osm" || record.source === "osm-IE") {
     const filePath = getRawFilePath(record);
     const data = readJsonFile(filePath);
     const elements = data?.data?.elements ?? [];
     const index = elements.findIndex(element =>
-      `osm:${element.type}:${element.id}` === id
+      `${record.source}:${element.type}:${element.id}` === id
     );
 
     if (index === -1) {
@@ -376,7 +485,15 @@ function getRawFilePath(record) {
   }
 
   if (record.source === "marinas-com") {
-    return path.join(DATA_DIR, "marinas-com", record.sourceFile);
+    return path.join(DATA_DIR, "GB", "marinas-com", record.sourceFile);
+  }
+
+  if (record.source === "tyha-IE") {
+    return path.join(DATA_DIR, "IE", "tyha", "marinas", record.sourceFile);
+  }
+
+  if (record.source === "marinas-com-IE") {
+    return path.join(DATA_DIR, "IE", "marinas-com", record.sourceFile);
   }
 
   if (record.source === "osm") {
@@ -385,6 +502,10 @@ function getRawFilePath(record) {
       "sailingworldmap",
       "uk-marinas2.json"
     );
+  }
+
+  if (record.source === "osm-IE") {
+    return path.join(DATA_DIR, "IE", "sailingworldmap", "ie-marinas.json");
   }
 
   throw new Error(`Unsupported raw source: ${record.source}`);
@@ -449,7 +570,7 @@ function updateOsmRecord(record, updates) {
   const filePath = getRawFilePath(record);
   const data = readJsonFile(filePath);
   const element = data?.data?.elements?.find(item =>
-    `osm:${item.type}:${item.id}` === record.id
+    `${record.source}:${item.type}:${item.id}` === record.id
   );
 
   if (!element) {

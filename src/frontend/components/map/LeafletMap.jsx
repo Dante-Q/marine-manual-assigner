@@ -322,6 +322,9 @@ function createMarkerIcon(L, source) {
     tyha: "tyha",
     "marinas-com": "marinas-com",
     osm: "osm",
+    "tyha-IE": "tyha-IE",
+    "marinas-com-IE": "marinas-com-IE",
+    "osm-IE": "osm-IE",
     saved: "saved",
     manual: "manual"
   }[source] ?? "default";
@@ -394,6 +397,9 @@ function getSourceName(source) {
     tyha: "TYHA",
     "marinas-com": "Marinas.com",
     osm: "OpenStreetMap",
+    "tyha-IE": "TYHA-IE",
+    "marinas-com-IE": "Marinas.com-IE",
+    "osm-IE": "OpenStreetMap-IE",
     saved: "Saved record"
   };
 
